@@ -28,7 +28,6 @@ class PriorityAnalysis extends Component
     {
         $this->loadProductData();
         return view('livewire.priority-analysis', [
-            'title' => 'Product Priority Analysis',
             'products' => $this->products
         ]);
     }
