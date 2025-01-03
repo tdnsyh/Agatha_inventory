@@ -15,7 +15,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
@@ -23,45 +22,45 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped" id="table-sales">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Total Product</th>
-                                        <th>Total Amount</th>
-                                        <th data-type="date">Transaction Date</th>
-                                        <th data-sortable="false">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($sales as $sale)
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="table-sales">
+                                    <thead>
                                         <tr>
-                                            <td>{{ $sale->user->name ?? 'N/A' }}</td> <!-- Display user name -->
-                                            <td>{{ $sale->detail_sales->count() }}</td>
-                                            <!-- Total products (count of related details) -->
-                                            <td>Rp. {{ number_format($sale->total_amount, 2) }}</td>
-                                            <!-- Total amount (from sales table) -->
-                                            <td>{{ $sale->transaction_date->format('d-m-Y') }}</td>
-                                            <!-- Transaction date -->
-                                            <td>
-                                                <a class="btn icon icon-left btn-sm btn-info"
-                                                    href="{{ route('sales.show', $sale->id) }}">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                                <a class="btn icon icon-left btn-sm btn-warning"
-                                                    href="{{ route('sales.update', $sale->id) }}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                            </td>
+                                            <th>User</th>
+                                            <th>Total Product</th>
+                                            <th>Total Amount</th>
+                                            <th data-type="date">Transaction Date</th>
+                                            <th data-sortable="false">Action</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($sales as $sale)
+                                            <tr>
+                                                <td>{{ $sale->user->full_name }}</td>
+                                                <td>{{ $sale->details->sum('quantity') }}</td>
+                                                <td>Rp. {{ number_format($sale->total_amount, 2) }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($sale->transaction_date)->format('d-m-Y') }}
+                                                </td>
+                                                <td>
+                                                    <a class="btn icon icon-left btn-sm btn-info"
+                                                        href="{{ route('sales.show', $sale->id) }}">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+
+                                                    <a class="btn icon icon-left btn-sm btn-warning"
+                                                        href="{{ route('sales.update', $sale->id) }}">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </section>
     </div>
 </div>

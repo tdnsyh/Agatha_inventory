@@ -25,13 +25,9 @@ use App\Livewire\ManageProduction\ProductionReport;
 use App\Livewire\ManageProduction\ProductionUpdate;
 use App\Livewire\ManageProduction\ProductionRequest;
 use App\Livewire\ManageProduct\ProductBarcodeScanner;
-use App\Livewire\ManageInventory\InventoryIn\InventoryShow as InventoryInInventoryShow;
 use App\Livewire\ManageInventory\InventoryIn\InventoryIndex as InventoryInInventoryIndex;
-use App\Livewire\ManageInventory\InventoryIn\InventoryUpdate as InventoryInInventoryUpdate;
 use App\Livewire\ManageInventory\InventoryOut\InventoryCreate as InventoryOutInventoryCreate;
 use App\Livewire\ManageInventory\InventoryOut\InventoryIndex as InventoryOutInventoryIndex;
-use App\Livewire\ManageInventory\InventoryOut\InventoryShow as InventoryOutInventoryShow;
-use App\Livewire\ManageInventory\InventoryOut\InventoryUpdate as InventoryOutInventoryUpdate;
 use App\Livewire\ManageInventory\InventoryReport;
 use App\Livewire\ManageInventory\InventoryRequest\InventoryRequest;
 use App\Livewire\ManageInventory\InventoryRequest\InventoryRequestCreate;
@@ -58,7 +54,6 @@ Route::get('/priority-analysis', PriorityAnalysis::class)->name('priority-analys
 
 // Manage Product 
 Route::get('/product/create', ProductCreate::class)->name('product.create');
-Route::get('/product/update', ProductUpdate::class)->name('product.update');
 Route::get('/product/index', ProductIndex::class)->name('product.index');
 Route::get('/product/{id}', ProductShow::class)->name('product.show');
 Route::get('/product/{id}/update', ProductUpdate::class)->name('product.update');
@@ -71,12 +66,12 @@ Route::get('/production/show/{id}', ProductionShow::class)->name('production.sho
 Route::get('/production/create', ProductionCreate::class)->name('production.create');
 Route::get('/production/{id}/update', ProductionUpdate::class)->name('production.update');
 Route::get('/production/request', ProductionRequest::class)->name('production.request');
-Route::get('/production/request/{productionRequestId}/create', ProductionRequestCreate::class)->name('production.request.create');
+Route::get('/production/request/create/{productionRequestId}', ProductionRequestCreate::class)->name('production.request.create');
 Route::get('/production/report', ProductionReport::class)->name('production.report');
 
 // Manage Sales
 Route::get('/sales/index', SalesIndex::class)->name('sales.index');
-Route::get('/sales/show', SalesShow::class)->name('sales.show');
+Route::get('/sales/show/{id}', SalesShow::class)->name('sales.show');
 Route::get('/sales/create', SalesCreate::class)->name('sales.create');
 Route::get('/sales/update', SalesUpdate::class)->name('sales.update');
 Route::get('/sales/report', SalesReport::class)->name('sales.report');
@@ -97,7 +92,6 @@ Route::get('/inventory/request/create', InventoryRequestCreate::class)->name('in
 Route::get('/inventory/request/{id}', InventoryRequestShow::class)->name('inventory.request.show');
 Route::get('/inventory/request/{id}/edit', InventoryRequestUpdate::class)->name('inventory.request.update');
 Route::get('/inventory/request/{id}/update-status', InventoryRequestUpdateStatus::class)->name('inventory.request.update-status');
-Route::get('/inventory/{id}/update-status', InventoryRequestUpdateStatus::class)->name('inventory.request.update-status');
 
 Route::get('/inventory/report', InventoryReport::class)->name('inventory.report');
 

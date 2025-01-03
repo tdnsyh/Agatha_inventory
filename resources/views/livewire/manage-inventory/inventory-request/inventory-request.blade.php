@@ -49,12 +49,10 @@
                                                     <span class="badge bg-secondary">Waiting for Response</span>
                                                 @elseif ($request->status_request == 'In Progress')
                                                     <span class="badge bg-warning">In Progress</span>
-                                                @elseif ($request->status_request == 'Pending Approval')
-                                                    <span class="badge bg-warning">Pending Approval</span>
-                                                @elseif ($request->status_request == 'Spproved')
+                                                @elseif ($request->status_request == 'In Progress')
+                                                    <span class="badge bg-warning">In Progress</span>
+                                                @elseif ($request->status_request == 'Complete')
                                                     <span class="badge bg-success">Approved</span>
-                                                @elseif ($request->status_request == 'Quantity Mismatch')
-                                                    <span class="badge bg-danger">Quantity Mismatch</span>
                                                 @endif
                                             </td>
                                             <td>{{ $request->note ?? '-' }}</td>
@@ -65,7 +63,7 @@
                                                             class="bi bi-pencil"></i></a>
                                                     <a class="btn btn-sm btn-danger" href="#"><i
                                                             class="bi bi-trash"></i></a>
-                                                @elseif ($request->status_request == 'pending approval')
+                                                @elseif ($request->status_request == 'In Progress')
                                                     <a class="btn icon icon-left btn-sm btn-info"
                                                         href="{{ route('inventory.request.show', $request->id) }}"><i
                                                             class="bi bi-eye"></i></a>

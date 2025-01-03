@@ -16,109 +16,62 @@
                 </div>
             </div>
 
-            <div>
-                <div class="card">
-                    <div class="card-body">
-                        <form wire:submit.prevent="saveProduction">
-                            <div class="form-group">
-                                <label>Production Date</label>
-                                <input wire:model="production_date" class="form-control" type="date" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Production Request</label>
-                                <select wire:model="selected_production_request_id" class="form-control">
-                                    <option value="">Select a Production Request</option>
-                                    @foreach ($production_requests as $request)
-                                        <option value="{{ $request->id }}">
-                                            {{ $request->product->name }} - {{ $request->quantity_request }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('selected_production_request_id')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form wire:submit.prevent="saveProduction">
+                                <div class="form-group">
+                                    <label class="form-label">Production Request</label>
+                                    <select class="choices form-select" wire:model="production_request_id">
+                                        <option value="">Select Your Request</option>
+                                        @foreach ($productionRequests as $request)
+                                            <option value="{{ $request->id }}">
+                                                User : {{ $request->user_id }} |
+                                                Request Date: {{ $request->request_date }} |
+                                                Product Name: {{ $request->product->name }} |
+                                                Quantity: {{ $request->quantity_request }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                            <div class="form-group">
-                                <label>Production Status</label>
-                                <select wire:model="production_status" class="form-control">
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Complete">Complete</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Note</label>
-                                <textarea wire:model="note" class="form-control" placeholder="Your Note"></textarea>
-                            </div>
+                                <div class="form-group">
+                                    <label class="form-label">Production Status</label>
+                                    <select class="choices form-select" wire:model="production_status">
+                                        <option value="">Select Your Status</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Complete">Complete</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
 
-                            <div class="form-group">
-                                <button class="btn btn-primary" type="submit">Save Production</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Note</label>
+                                    <input class="form-control form-control-lg" type="text" wire:model="note"
+                                        placeholder="Your Note">
+                                </div>
 
-                <div class="card mt-3">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-3">
-                                <select wire:model="selected_product" class="form-control">
-                                    <option value="">Select Your Product</option>
-                                    @foreach ($products as $product)
-                                        <option value="{{ $product->id }}">{{ $product->name }} -
-                                            {{ $product->variant }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-lg-2">
-                                <input wire:model="quantity_produced" class="form-control" type="number"
-                                    placeholder="Quantity">
-                            </div>
-                            <div class="col-lg-2">
-                                <input wire:model="shelf_name" class="form-control" type="text"
-                                    placeholder="Shelf Name">
-                            </div>
-                            <div class="col-lg-2">
-                                <button wire:click.prevent="addDetailProduction" class="btn btn-primary">Add To
-                                    List</button>
-                            </div>
-                        </div>
+                                <div class="form-group">
+                                    <label class="form-label">Production Date</label>
+                                    <input class="form-control form-control-lg flatpickr" type="date"
+                                        wire:model="production_date" placeholder="Select Production Date">
+                                </div>
 
-                        <div class="table-responsive mt-3">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Code</th>
-                                        <th>Name</th>
-                                        <th>Variant</th>
-                                        <th>Quantity</th>
-                                        <th>Shelf Name</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($detail_productions as $index => $detail)
-                                        <tr>
-                                            <td>{{ $detail['product_code'] }}</td>
-                                            <td>{{ $detail['product_name'] }}</td>
-                                            <td>{{ $detail['variant'] }}</td>
-                                            <td>{{ $detail['quantity_produced'] }}</td>
-                                            <td>{{ $detail['shelf_name'] }}</td>
-                                            <td>
-                                                <button
-                                                    wire:click.prevent="removeDetailProduction({{ $index }})"
-                                                    class="btn btn-danger btn-sm">Remove</button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                <div class="form-group">
+                                    <label class="form-label">Shelf name</label>
+                                    <input class="form-control form-control-lg" type="text" wire:model="shelf_name"
+                                        placeholder="Shelf Name">
+                                </div>
+
+                                <div class="form-group">
+                                    <button class="btn btn-primary" type="submit">Save Production</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-
         </section>
     </div>
 </div>

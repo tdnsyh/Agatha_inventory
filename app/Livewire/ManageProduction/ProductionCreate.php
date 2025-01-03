@@ -4,11 +4,13 @@ namespace App\Livewire\ManageProduction;
 
 use Livewire\Component;
 use Livewire\Attributes\Title;
+use App\Models\Products;
 use App\Models\Production;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Products;
-use App\Models\DetailProduction;
 use App\Models\ProductionRequest;
+use App\Models\DetailProduction;
+use Illuminate\Support\Str;
+use App\Models\InventoryIn;
 
 #[Title('Create Production')]
 class ProductionCreate extends Component
@@ -17,98 +19,91 @@ class ProductionCreate extends Component
     public $title = "Create Production";
     public $text_subtitle = "This page displays for create data production.";
 
-    public $production_requests;
-    public $selected_production_request_id;
-    public $production_date;
-    public $production_status = 'In Progress';
+    public $production_request_id;
+    public $production_status;
     public $note;
-    public $selected_product;
-    public $quantity_produced;
+    public $production_date;
     public $shelf_name;
-    public $detail_productions = [];
+    public $selectedRequest;
     public $products;
 
     public function mount()
     {
-        $this->products = Products::all();
-        $this->production_requests = ProductionRequest::with('product')->get();
+        $this->products = [];
+        $this->selectedRequest = null;
+    }
+
+    public function updatedProductionRequestId($value)
+    {
+        $this->selectedRequest = ProductionRequest::with('product')->find($value);
+        if ($this->selectedRequest) {
+
+            $this->products = Products::where('id', $this->selectedRequest->product_id)->get();
+        }
     }
 
     public function saveProduction()
     {
         $this->validate([
-            'selected_production_request_id' => 'required|exists:production_request,id',
+            'production_request_id' => 'required',
+            'production_status' => 'required',
             'production_date' => 'required|date',
-            'production_status' => 'required|string',
-            'note' => 'nullable|string',
-            'detail_productions' => 'required|array|min:1',
         ]);
 
         $production = Production::create([
-            'user_id' => Auth::id(),
-            'production_request_id' => $this->selected_production_request_id,
-            'production_date' => $this->production_date,
+            'production_request_id' => $this->production_request_id,
             'production_status' => $this->production_status,
+            'production_date' => $this->production_date,
             'note' => $this->note,
+            'user_id' => Auth::id(),
         ]);
 
-        foreach ($this->detail_productions as $detail) {
-            $product = Products::find($detail['product_id']);
+        $productionRequest = ProductionRequest::find($this->production_request_id);
+        $productionRequest->status_request = $this->production_status;
+        $productionRequest->save();
 
-            $expiration_date = now()->addDays($product->expired_day);
+        foreach ($this->products as $product) {
+            $expiredDay = $product->expired_day;
+            $expirationDate = \Carbon\Carbon::parse($this->production_date)->addDays($expiredDay);
+            $batchCode = 'BC-' . strtoupper(substr(uniqid(rand(), true), -4));
 
-            DetailProduction::create([
+            $detailProduction = DetailProduction::create([
                 'production_id' => $production->id,
-                'product_id' => $detail['product_id'],
-                'batch_code' => $this->generateBatchCode($detail, $this->production_date),
-                'shelf_name' => $detail['shelf_name'],
-                'quantity_produced' => $detail['quantity_produced'],
-                'expiration_date' => $expiration_date,
+                'product_id' => $product->id,
+                'batch_code' => $batchCode,
+                'shelf_name' => $this->shelf_name,
+                'quantity_produced' => $this->selectedRequest->quantity_request,
+                'expiration_date' => $expirationDate,
             ]);
+
+            if ($this->production_status === 'Complete') {
+                $productToUpdate = Products::find($product->id);
+                if ($productToUpdate) {
+                    $productToUpdate->stock += $detailProduction->quantity_produced;
+                    $productToUpdate->save();
+
+                    InventoryIn::create([
+                        'product_id' => $product->id,
+                        'inventory_date' => $this->production_date,
+                        'batch_code' => $batchCode,
+                        'shelf_name' => $this->shelf_name,
+                        'initial_stock' => $productToUpdate->stock - $detailProduction->quantity_produced,
+                        'final_stock' => $productToUpdate->stock,
+                        'unit_price' => $productToUpdate->price,
+                        'expiration_date' => $expirationDate,
+                    ]);
+                }
+            }
         }
 
-        session()->flash('message', 'Production and details successfully saved.');
-        $this->reset();
-    }
-
-    protected function generateBatchCode($detail, $productionDate)
-    {
-        $date = \Carbon\Carbon::parse($productionDate)->format('dm');
-        $randomNumber = str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
-        return strtoupper($detail['product_code'] . '-' . $date . $randomNumber);
-    }
-
-    public function addDetailProduction()
-    {
-        $this->validate([
-            'selected_product' => 'required|exists:products,id',
-            'quantity_produced' => 'required|integer|min:1',
-            'shelf_name' => 'nullable|string|max:255',
-        ]);
-
-        $product = $this->products->find($this->selected_product);
-
-        $this->detail_productions[] = [
-            'product_id' => $product->id,
-            'product_code' => $product->code,
-            'product_name' => $product->name,
-            'variant' => $product->variant,
-            'quantity_produced' => $this->quantity_produced,
-            'shelf_name' => $this->shelf_name,
-        ];
-
-        $this->reset('selected_product', 'quantity_produced', 'shelf_name');
-    }
-
-
-    public function removeDetailProduction($index)
-    {
-        unset($this->detail_productions[$index]);
-        $this->detail_productions = array_values($this->detail_productions);
+        session()->flash('message', 'Production saved successfully!');
     }
 
     public function render()
     {
-        return view('livewire.manage-production.production-create');
+        $productionRequests = ProductionRequest::with('product')->get();
+        return view('livewire.manage-production.production-create', [
+            'productionRequests' => $productionRequests
+        ]);
     }
 }

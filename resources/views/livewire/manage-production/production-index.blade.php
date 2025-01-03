@@ -22,65 +22,58 @@
                         <h4 class="col-auto">{{ $title }} Datatable</h4>
                     </div>
                     <div class="card-body">
-                        <div>
-                            <div class="mb-3">
-                                <input type="text" class="form-control" placeholder="Search production status..."
-                                    wire:model="search" />
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="table-production">
-                                    <thead>
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table-production">
+                                <thead>
+                                    <tr>
+                                        <th wire:click="sortBy('user_id')">User</th>
+                                        <th>Production Request</th>
+                                        <th wire:click="sortBy('production_date')" data-type="date">
+                                            Production Date
+                                            @if ($sortField === 'production_date')
+                                                <i
+                                                    class="bi {{ $sortDirection === 'asc' ? 'bi-arrow-down' : 'bi-arrow-up' }}"></i>
+                                            @endif
+                                        </th>
+                                        <th wire:click="sortBy('production_status')">Production Status</th>
+                                        <th>Total Product</th>
+                                        <th>Note</th>
+                                        <th data-sortable="false">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($productions as $production)
                                         <tr>
-                                            <th wire:click="sortBy('user_id')">User</th>
-                                            <th>Production Request</th>
-                                            <th wire:click="sortBy('production_date')" data-type="date">
-                                                Production Date
-                                                @if ($sortField === 'production_date')
-                                                    <i
-                                                        class="bi {{ $sortDirection === 'asc' ? 'bi-arrow-down' : 'bi-arrow-up' }}"></i>
-                                                @endif
-                                            </th>
-                                            <th wire:click="sortBy('production_status')">Production Status</th>
-                                            <th>Total Product</th>
-                                            <th>Note</th>
-                                            <th data-sortable="false">Action</th>
+                                            <td>{{ $production->user->full_name }}</td>
+                                            <td>PR-0{{ $production->production_request_id }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($production->production_date)->format('d-m-Y') }}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ $production->production_status }}</span>
+                                            </td>
+                                            <td>{{ $production->details->count() }}</td>
+                                            <td>{{ $production->note ?? '-' }}</td>
+                                            <td>
+                                                <a class="btn icon icon-left btn-sm btn-info"
+                                                    href="{{ route('production.show', $production->id) }}">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a class="btn icon icon-left btn-sm btn-warning"
+                                                    href="{{ route('production.update', $production->id) }}">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($productions as $production)
-                                            <tr>
-                                                <td>{{ $production->user->full_name }}</td>
-                                                <td>PR-0{{ $production->production_request_id }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($production->production_date)->format('d-m-Y') }}
-                                                </td>
-                                                <td>
-                                                    <span
-                                                        class="badge bg-info">{{ $production->production_status }}</span>
-                                                </td>
-                                                <td>{{ $production->details->count() }}</td>
-                                                <td>{{ $production->note ?? '-' }}</td>
-                                                <td>
-                                                    <a class="btn icon icon-left btn-sm btn-info"
-                                                        href="{{ route('production.show', $production->id) }}">
-                                                        <i class="bi bi-eye"></i>
-                                                    </a>
-                                                    <a class="btn icon icon-left btn-sm btn-warning"
-                                                        href="{{ route('production.update', $production->id) }}">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="7" class="text-center">No data found.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="mt-3">
-                                {{ $productions->links() }}
-                            </div>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center">No data found.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            {{ $productions->links() }}
                         </div>
                     </div>
                 </div>

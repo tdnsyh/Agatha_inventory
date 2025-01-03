@@ -15,111 +15,93 @@
                     </div>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <form action="#">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Form Production -->
+                        <div class="col-12">
+                            <form wire:submit.prevent="saveProduction">
                                 <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-12 col-md-4">
-                                            <label class="form-label">Request Production From</label>
-                                            <input class="form-control form-control-lg" type="text"
-                                                value="user_inventory_001" placeholder="Request Form" readonly>
-                                        </div>
-                                        <div class="col-12 col-md-4">
-                                            <label class="form-label">Reference Request Production ID </label>
-                                            <input class="form-control form-control-lg" type="number" value="1"
-                                                placeholder="Refrence Request Production ID" readonly>
-                                        </div>
-                                    </div>
+                                    <label>Production Request ID</label>
+                                    <input type="text" class="form-control" value="{{ $productionRequest->id }}"
+                                        disabled>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Production Date</label>
-                                    <input class="form-control form-control-lg flatpickr" type="date"
-                                        placeholder="Select Production Date">
+                                    <label>Production Request By</label>
+                                    <input type="text" class="form-control"
+                                        value="{{ $productionRequest->user->full_name }}" disabled>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Production Status</label>
-                                    <select class="choices form-select">
-                                        <option value="">Select Your Status</option>
-                                        <option value="In Progress" selected>In Progress</option>
+                                    <label>Production Date</label>
+                                    <input type="date" wire:model="production_date" class="form-control">
+                                    @error('production_date')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="form-group">
+                                    <label>Production Status</label>
+                                    <select wire:model="production_status" class="form-control">
+                                        <option value="In Progress">In Progress</option>
                                         <option value="Complete">Complete</option>
                                         <option value="Cancelled">Cancelled</option>
                                     </select>
+                                    @error('production_status')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Note</label>
-                                    <input class="form-control form-control-lg" type="text" placeholder="Your Note">
+                                    <label>Note</label>
+                                    <textarea wire:model="note" class="form-control"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Shelf Name</label>
-                                    <input class="form-control form-control-lg" type="text"
-                                        placeholder="Your Shelf Name">
+                                    <label>Shelf Name</label>
+                                    <input type="text" wire:model="shelf_name" class="form-control">
                                 </div>
-
-                                <div class="form-group">
-                                    <button class="btn btn-primary" type="submit">Save Production</button>
-                                </div>
+                                <button type="submit" class="btn btn-primary">Save Production</button>
                             </form>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped" id="table-detail-production">
-                                            <thead>
-                                                <tr>
-                                                    <th>Code Product</th>
-                                                    <th>Name Product</th>
-                                                    <th>Variant Product</th>
-                                                    <th>Price Product</th>
-                                                    <th data-type="date">Expiration Date</th>
-                                                    <th>Stock Produced</th>
-                                                    <th>Shelf Name</th>
-                                                    <th data-sortable="false">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>NSR-S-001</td>
-                                                    <td>Nastar</td>
-                                                    <td>Tabung S</td>
-                                                    <td>Rp. 0</td>
-                                                    <td>01-12-2024</td>
-                                                    <td>0</td>
-                                                    <td>RAKGUDANG-A001</td>
-                                                    <td>
-                                                        <a class="btn icon icon-left btn-sm btn-danger"
-                                                            href="#"><i class="bi bi-trash"></i></a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <!-- Table Products -->
+                    <div class="col-124">
+                        <h3>Data Request Production</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table-detail-production">
+                                <thead>
+                                    <tr>
+                                        <th>Code Product</th>
+                                        <th>Name Product</th>
+                                        <th>Variant Product</th>
+                                        <th>Price Product</th>
+                                        <th data-type="date">Expiration Day</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($products as $product)
+                                        <tr>
+                                            <td>{{ $product->code }}</td>
+                                            <td>{{ $product->name }}</td>
+                                            <td>{{ $product->variant }}</td>
+                                            <td>{{ number_format($product->price, 0, ',', '.') }}</td>
+                                            <td>{{ $product->expired_day }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </section>
     </div>
 </div>
 
 @push('styles-priority')
     <link href="{{ asset('storage/assets/extensions/flatpickr/flatpickr.min.css') }}" rel="stylesheet">
-
     <link href="{{ asset('storage/assets/extensions/choices.js/public/assets/styles/choices.css') }}" rel="stylesheet">
-
     <link href="{{ asset('storage/assets/extensions/simple-datatables/style.css') }}" rel="stylesheet">
     <link href="{{ asset('storage/assets/compiled/css/table-datatable.css') }}" rel="stylesheet" crossorigin>
 @endpush
@@ -134,10 +116,8 @@
 
 @push('scripts')
     <script src="{{ asset('storage/assets/extensions/flatpickr/flatpickr.min.js') }}"></script>
-
     <script src="{{ asset('storage/assets/extensions/choices.js/public/assets/scripts/choices.js') }}"></script>
     <script src="{{ asset('storage/assets/static/js/pages/form-element-select.js') }}"></script>
-
     <script src="{{ asset('storage/assets/extensions/simple-datatables/umd/simple-datatables.js') }}"></script>
     <script src="{{ asset('storage/assets/static/js/pages/simple-datatables.js') }}"></script>
 

@@ -48,12 +48,12 @@
                                         </td>
                                         <td>{{ $request->note ?? '-' }}</td>
                                         <td>
-                                            @if ($request->status_request == 'Approved')
-                                                <a class="btn icon icon-left btn-sm btn-info"
-                                                    href="{{ route('production.show', $request->id) }}">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                            @else
+                                            @if (
+                                                !(
+                                                    $request->status_request == 'In Progress' ||
+                                                    $request->status_request == 'Complete' ||
+                                                    $request->status_request == 'Cancelled'
+                                                ))
                                                 <a class="btn btn-sm btn-primary"
                                                     href="{{ route('production.request.create', ['productionRequestId' => $request->id]) }}">
                                                     Make Production

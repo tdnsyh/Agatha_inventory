@@ -31,7 +31,6 @@ class ProductionUpdate extends Component
 
     public function updateProduction()
     {
-
         $this->validate([
             'production_date' => 'required|date',
             'production_status' => 'required|string',
@@ -44,8 +43,13 @@ class ProductionUpdate extends Component
             'note' => $this->note,
         ]);
 
+        $productionRequest = $this->production->productionRequest;
+        $productionRequest->status_request = $this->production_status;
+        $productionRequest->save();
+
         session()->flash('message', 'Production updated successfully!');
     }
+
 
     public function render()
     {

@@ -22,11 +22,9 @@ class ProductionRequest extends Component
                 return 'secondary';
             case 'In Progress':
                 return 'warning';
-            case 'Pending Approval':
-                return 'warning';
-            case 'Quantity Mismatch':
+            case 'Cancelled':
                 return 'danger';
-            case 'Approved':
+            case 'Completed':
                 return 'info';
             default:
                 return 'primary';

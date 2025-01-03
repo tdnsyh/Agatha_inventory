@@ -15,8 +15,7 @@ class SalesIndex extends Component
 
     public function render()
     {
-        $sales = Sales::with('user')
-            ->get();
+        $sales = Sales::with('user')->get();
         return view('livewire.manage-sales.sales-index', compact('sales'));
     }
 }
