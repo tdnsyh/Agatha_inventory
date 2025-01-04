@@ -2,6 +2,7 @@
     <div class="page-heading">
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
+        <x-partials.alert />
         <section class="section">
             <div class="card">
                 <div class="card-body">
@@ -13,11 +14,6 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    @if (session()->has('message'))
-                        <div class="alert alert-success">
-                            {{ session('message') }}
-                        </div>
-                    @endif
                     <form wire:submit.prevent="updateProduct">
                         <div class="row row-cols-1 row-cols-md-2">
                             <div class="col">

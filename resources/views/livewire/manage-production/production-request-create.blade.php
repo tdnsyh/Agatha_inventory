@@ -1,6 +1,7 @@
 <div>
     <div class="page-heading">
         {{-- Page-Title --}}
+        <x-partials.alert />
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
             <div class="card">

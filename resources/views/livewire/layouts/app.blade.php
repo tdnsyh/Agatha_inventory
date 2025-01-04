@@ -31,6 +31,7 @@
                 {{-- Navbar --}}
                 <x-partials.navbar />
             </header>
+            <x-partials.alert />
             <div id="main-content">
                 {{ $slot }}
             </div>
@@ -38,6 +39,18 @@
             <x-partials.footer />
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var alert = document.querySelector('.alert');
+            if (alert) {
+                setTimeout(function() {
+                    alert.classList.remove('show');
+                    alert.classList.add('fade');
+                }, 5000);
+            }
+        });
+    </script>
     @stack('scripts-priority')
     <script src="{{ asset('assets/js/app.js') }}"></script>
     <script src="{{ asset('assets/static/js/components/dark.js') }}"></script>

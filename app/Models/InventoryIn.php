@@ -23,9 +23,18 @@ class InventoryIn extends Model
         'expiration_date',
     ];
 
-    // Relasi dengan tabel 'products'
+    protected $casts = [
+        'expiration_date' => 'date',
+    ];
+
+
     public function product()
     {
         return $this->belongsTo(Products::class, 'product_id');
+    }
+
+    public function inventoryOut()
+    {
+        return $this->hasMany(InventoryOut::class, 'inventory_in_id');
     }
 }

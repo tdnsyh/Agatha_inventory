@@ -82,9 +82,8 @@
                     </div>
                 </div>
             </div>
+        </section>
     </div>
-    </section>
-</div>
 </div>
 
 @push('styles-priority')

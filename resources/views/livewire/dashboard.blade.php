@@ -2,12 +2,8 @@
     <div class="page-heading">
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
+        <x-partials.alert />
         <section class="section">
-            <h1>Welcome to your dashboard!</h1>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="btn btn-danger mb-4">Logout</button>
-            </form>
             <div class="row">
                 <div class="col-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
                     <div class="card">

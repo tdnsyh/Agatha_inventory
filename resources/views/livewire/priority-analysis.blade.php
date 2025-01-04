@@ -2,6 +2,7 @@
     <div class="page-heading">
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
+        <x-partials.alert />
         <section class="section">
             <div class="card">
                 <div class="card-body">
@@ -69,7 +70,6 @@
 
 @push('styles-priority')
     <link href="{{ asset('storage/assets/extensions/flatpickr/flatpickr.min.css') }}" rel="stylesheet">
-
     <link href="{{ asset('storage/assets/extensions/simple-datatables/style.css') }}" rel="stylesheet">
     <link href="{{ asset('storage/assets/compiled/css/table-datatable.css') }}" rel="stylesheet" crossorigin>
 @endpush
@@ -84,10 +84,8 @@
 
 @push('scripts')
     <script src="{{ asset('storage/assets/extensions/flatpickr/flatpickr.min.js') }}"></script>
-
     <script src="{{ asset('storage/assets/extensions/simple-datatables/umd/simple-datatables.js') }}"></script>
     <script src="{{ asset('storage/assets/static/js/pages/simple-datatables.js') }}"></script>
-
     <script>
         flatpickr('.flatpickr', {
             dateFormat: "d-m-Y",

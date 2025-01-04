@@ -2,6 +2,7 @@
     <div class="page-heading">
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
+        <x-partials.alert />
         <section class="section">
             <a class="btn icon icon-left btn-secondary mt-3" href="{{ route('inventory.request.index') }}">
                 <i class="bi bi-arrow-left"></i>

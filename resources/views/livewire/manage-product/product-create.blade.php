@@ -2,6 +2,7 @@
     <div class="page-heading">
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
+        <x-partials.alert />
         <section class="section">
             <div class="card">
                 <div class="card-body">
@@ -78,7 +79,15 @@
         </section>
     </div>
 </div>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var flashModal = document.getElementById('flashModal');
+        if (flashModal) {
+            var modalInstance = new bootstrap.Modal(flashModal);
+            modalInstance.show();
+        }
+    });
+</script>
 @push('styles-priority')
     <link href="{{ asset('storage/assets/extensions/choices.js/public/assets/styles/choices.css') }}" rel="stylesheet">
 @endpush

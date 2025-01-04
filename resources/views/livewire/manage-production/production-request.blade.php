@@ -2,6 +2,7 @@
     <div class="page-heading">
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
+        <x-partials.alert />
         <section class="section">
             <div class="card mt-3">
                 <div class="card-header">

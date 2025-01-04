@@ -2,6 +2,7 @@
     <div class="page-heading">
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
+        <x-partials.alert />
         <section class="section">
             <div class="card">
                 <div class="card-body">
@@ -17,7 +18,6 @@
                 </div>
                 <div class="card-body">
                     <form wire:submit.prevent="updateRequest">
-                        <!-- Request Date -->
                         <div class="form-group">
                             <label class="form-label">Request Date</label>
                             <input class="form-control flatpickr" type="date" wire:model="request_date">
@@ -49,7 +49,6 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-
                         <div class="form-group">
                             <button class="btn btn-primary" type="submit">Save Changes</button>
                         </div>
