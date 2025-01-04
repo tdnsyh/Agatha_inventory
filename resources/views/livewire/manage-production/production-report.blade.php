@@ -32,6 +32,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h4 class="col-auto">Production Report</h4>
+                            <button id="exportExcel" class="btn btn-outline-success">Export to Excel</button>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -71,6 +72,29 @@
         </section>
     </div>
 </div>
+<script>
+    document.getElementById('exportExcel').addEventListener('click', function() {
+        var table = document.getElementById('table-production-report');
+
+        var wb = XLSX.utils.table_to_book(table, {
+            sheet: "Production Report"
+        });
+
+        var now = new Date();
+        var options = {
+            timeZone: 'Asia/Jakarta',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+        };
+        var formatter = new Intl.DateTimeFormat('en-GB', options);
+        var formattedDateTime = formatter.format(now).replace(/[\s,:/]/g, '-');
+        var fileName = `Production_Report_${formattedDateTime}.xlsx`;
+
+        XLSX.writeFile(wb, fileName);
+    });
+</script>
+
 
 @push('styles-priority')
     <link href="{{ asset('storage/assets/extensions/flatpickr/flatpickr.min.css') }}" rel="stylesheet">
@@ -89,7 +113,7 @@
 
 @push('scripts')
     <script src="{{ asset('storage/assets/extensions/flatpickr/flatpickr.min.js') }}"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="{{ asset('storage/assets/extensions/simple-datatables/umd/simple-datatables.js') }}"></script>
     <script src="{{ asset('storage/assets/static/js/pages/simple-datatables.js') }}"></script>
 
