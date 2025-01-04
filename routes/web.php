@@ -57,8 +57,8 @@ Route::get('/product/create', ProductCreate::class)->name('product.create');
 Route::get('/product/index', ProductIndex::class)->name('product.index');
 Route::get('/product/{id}', ProductShow::class)->name('product.show');
 Route::get('/product/{id}/update', ProductUpdate::class)->name('product.update');
-Route::delete('/products/{product}', [ProductCreate::class, 'destroy'])->name('products.destroy');
-Route::get('/product/barcode_scanner', ProductBarcodeScanner::class)->name('barcode-scanner');
+Route::delete('/product/{product}', [ProductCreate::class, 'destroy'])->name('product.destroy');
+Route::get('/product/barcode-scanner', ProductBarcodeScanner::class)->name('barcode-scanner');
 
 // Manage Production
 Route::get('/production/index', ProductionIndex::class)->name('production.index');
