@@ -56,11 +56,17 @@
                                             <td>{{ $product->updated_at->format('Y-m-d H:i:s') }}</td>
                                             <td>
                                                 <a href="{{ route('product.show', $product->id) }}"
-                                                    class="btn btn-info btn-sm">Details</a>
+                                                    class="btn btn-info btn-sm">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
                                                 <a href="{{ route('product.update', $product->id) }}"
-                                                    class="btn btn-warning btn-sm">Edit</a>
+                                                    class="btn btn-warning btn-sm">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
                                                 <button wire:click="destroy({{ $product->id }})"
-                                                    class="btn btn-danger btn-sm">Delete</button>
+                                                    class="btn btn-danger btn-sm">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
