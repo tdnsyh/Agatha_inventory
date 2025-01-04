@@ -3,23 +3,14 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('product.index') }}">
-                                <i class="bi bi-arrow-left"></i>
-                                Back
-                            </a>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('product.index') }}">
+                        <i class="bi bi-arrow-left"></i>
+                        Back
+                    </a>
                 </div>
             </div>
-            @if (session()->has('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
             <div class="card">
                 <div class="card-body">
                     <form wire:submit.prevent="save">

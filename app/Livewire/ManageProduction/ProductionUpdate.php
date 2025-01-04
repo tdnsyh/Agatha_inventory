@@ -50,7 +50,6 @@ class ProductionUpdate extends Component
         session()->flash('message', 'Production updated successfully!');
     }
 
-
     public function render()
     {
         return view('livewire.manage-production.production-update');

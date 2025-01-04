@@ -3,22 +3,17 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('production.request') }}">
-                                <i class="bi bi-arrow-left"></i>
-                                Back
-                            </a>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('production.request') }}">
+                        <i class="bi bi-arrow-left"></i>
+                        Back
+                    </a>
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <!-- Form Production -->
                         <div class="col-12">
                             <form wire:submit.prevent="saveProduction">
                                 <div class="form-group">
@@ -65,7 +60,6 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <!-- Table Products -->
                     <div class="col-124">
                         <h3>Data Request Production</h3>
                         <div class="table-responsive">

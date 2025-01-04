@@ -84,7 +84,6 @@ class ProductionRequestCreate extends Component
         }
 
         $this->productionRequest->update(['status_request' => $this->production_status]);
-
         session()->flash('message', 'Production created successfully!');
     }
 

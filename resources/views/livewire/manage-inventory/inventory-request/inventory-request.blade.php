@@ -3,84 +3,72 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <a class="btn icon icon-left btn-lg btn-primary"
-                                href="{{ route('inventory.request.create') }}">
-                                <i class="bi bi-plus"></i>
-                                Add Data Request Production
-                            </a>
-                        </div>
-                    </div>
+            <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('inventory.request.create') }}">
+                <i class="bi bi-plus"></i>
+                Add Request Production
+            </a>
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4 class="col-auto">{{ $title }} Datatable</h4>
                 </div>
-            </div>
-
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="col-auto">{{ $title }} Datatable</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped" id="table-request-production">
-                                <thead>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table-request-production">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Product Name</th>
+                                    <th>Quantity Request</th>
+                                    <th data-type="date">Production Request Date</th>
+                                    <th>Status Request</th>
+                                    <th>Note</th>
+                                    <th data-sortable="false">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($productionRequests as $request)
                                     <tr>
-                                        <th>User</th>
-                                        <th>Product Name</th>
-                                        <th>Quantity Request</th>
-                                        <th data-type="date">Production Request Date</th>
-                                        <th>Status Request</th>
-                                        <th>Note</th>
-                                        <th data-sortable="false">Action</th>
+                                        <td>{{ $request->user->full_name ?? 'N/A' }}</td>
+                                        <td>{{ $request->product->name ?? 'N/A' }}</td>
+                                        <td>{{ $request->quantity_request }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($request->request_date)->format('d-m-Y') }}
+                                        </td>
+                                        <td>
+                                            @if ($request->status_request == 'Waiting For Response')
+                                                <span class="badge bg-secondary">Waiting for Response</span>
+                                            @elseif ($request->status_request == 'In Progress')
+                                                <span class="badge bg-warning">In Progress</span>
+                                            @elseif ($request->status_request == 'In Progress')
+                                                <span class="badge bg-warning">In Progress</span>
+                                            @elseif ($request->status_request == 'Complete')
+                                                <span class="badge bg-success">Approved</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $request->note ?? '-' }}</td>
+                                        <td>
+                                            @if ($request->status_request == 'Waiting For Response')
+                                                <a class="btn btn-sm btn-warning"
+                                                    href="{{ route('inventory.request.update', $request->id) }}"><i
+                                                        class="bi bi-pencil"></i></a>
+                                                <a class="btn btn-sm btn-danger" href="#"><i
+                                                        class="bi bi-trash"></i></a>
+                                            @elseif ($request->status_request == 'In Progress')
+                                                <a class="btn icon icon-left btn-sm btn-info"
+                                                    href="{{ route('inventory.request.show', $request->id) }}"><i
+                                                        class="bi bi-eye"></i></a>
+                                                <a class="btn icon icon-pencil btn-sm btn-warning"
+                                                    href="{{ route('inventory.request.update-status', $request->id) }}"><i
+                                                        class="bi bi-pencil"></i></a>
+                                            @elseif ($request->status_request == 'in progress' || $request->status_request == 'approved')
+                                                <a class="btn icon icon-left btn-sm btn-info"
+                                                    href="{{ route('inventory.request.show', $request->id) }}"><i
+                                                        class="bi bi-eye"></i></a>
+                                            @endif
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($productionRequests as $request)
-                                        <tr>
-                                            <td>{{ $request->user->full_name ?? 'N/A' }}</td>
-                                            <td>{{ $request->product->name ?? 'N/A' }}</td>
-                                            <td>{{ $request->quantity_request }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($request->request_date)->format('d-m-Y') }}
-                                            </td>
-                                            <td>
-                                                @if ($request->status_request == 'Waiting For Response')
-                                                    <span class="badge bg-secondary">Waiting for Response</span>
-                                                @elseif ($request->status_request == 'In Progress')
-                                                    <span class="badge bg-warning">In Progress</span>
-                                                @elseif ($request->status_request == 'In Progress')
-                                                    <span class="badge bg-warning">In Progress</span>
-                                                @elseif ($request->status_request == 'Complete')
-                                                    <span class="badge bg-success">Approved</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $request->note ?? '-' }}</td>
-                                            <td>
-                                                @if ($request->status_request == 'Waiting For Response')
-                                                    <a class="btn btn-sm btn-warning"
-                                                        href="{{ route('inventory.request.update', $request->id) }}"><i
-                                                            class="bi bi-pencil"></i></a>
-                                                    <a class="btn btn-sm btn-danger" href="#"><i
-                                                            class="bi bi-trash"></i></a>
-                                                @elseif ($request->status_request == 'In Progress')
-                                                    <a class="btn icon icon-left btn-sm btn-info"
-                                                        href="{{ route('inventory.request.show', $request->id) }}"><i
-                                                            class="bi bi-eye"></i></a>
-                                                    <a class="btn icon icon-pencil btn-sm btn-warning"
-                                                        href="{{ route('inventory.request.update-status', $request->id) }}"><i
-                                                            class="bi bi-pencil"></i></a>
-                                                @elseif ($request->status_request == 'in progress' || $request->status_request == 'approved')
-                                                    <a class="btn icon icon-left btn-sm btn-info"
-                                                        href="{{ route('inventory.request.show', $request->id) }}"><i
-                                                            class="bi bi-eye"></i></a>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

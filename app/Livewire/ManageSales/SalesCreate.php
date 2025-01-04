@@ -3,6 +3,8 @@
 namespace App\Livewire\ManageSales;
 
 use App\Models\DetailSales;
+use App\Models\InventoryIn;
+use App\Models\InventoryOut;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Carbon;
@@ -38,27 +40,46 @@ class SalesCreate extends Component
 
     public function addProduct()
     {
-        $product = Products::where('code', $this->scan_barcode)->first();
+        $inventory = InventoryIn::where('batch_code', $this->scan_barcode)->first();
 
-        if ($product) {
-            $expiration_date = now()->addDays($product->expired_day)->toDateString();
+        if ($inventory) {
+            $existingProductKey = null;
 
-            $this->products[] = [
-                'product_id' => $product->id,
-                'product_code' => $product->code,
-                'product_name' => $product->name,
-                'variant' => $product->variant,
-                'unit_price' => $product->price,
-                'quantity' => $this->quantity,
-                'expired_day' => $expiration_date,
-                'sub_total' => $this->quantity * $product->price,
-            ];
+            foreach ($this->products as $index => $product) {
+                if ($product['batch_code'] === $inventory->batch_code) {
+                    $existingProductKey = $index;
+                    break;
+                }
+            }
 
-            $this->total_amount += $this->quantity * $product->price;
+            if ($existingProductKey !== null) {
+                $this->products[$existingProductKey]['quantity'] += $this->quantity;
+                $this->products[$existingProductKey]['sub_total'] = $this->products[$existingProductKey]['quantity'] * $inventory->unit_price;
+            } else {
+                $expiration_date = now()->addDays($inventory->product->expired_day)->toDateString();
+
+                $this->products[] = [
+                    'product_id' => $inventory->product_id,
+                    'product_code' => $inventory->product->code,
+                    'product_name' => $inventory->product->name,
+                    'variant' => $inventory->product->variant,
+                    'unit_price' => $inventory->unit_price,
+                    'quantity' => $this->quantity,
+                    'expired_day' => $expiration_date,
+                    'sub_total' => $this->quantity * $inventory->unit_price,
+                    'inventory_in_id' => $inventory->id,
+                    'batch_code' => $inventory->batch_code,
+                ];
+            }
+
+            $this->total_amount = 0;
+            foreach ($this->products as $product) {
+                $this->total_amount += $product['sub_total'];
+            }
 
             $this->resetProductForm();
         } else {
-            session()->flash('error', 'Product not found');
+            session()->flash('error', 'Batch code not found');
         }
     }
 
@@ -72,10 +93,10 @@ class SalesCreate extends Component
     public function saveSale()
     {
         $this->validate();
-
         DB::beginTransaction();
 
         try {
+
             $sale = Sales::create([
                 'user_id' => Auth::id(),
                 'transaction_date' => $this->transaction_date,
@@ -83,6 +104,7 @@ class SalesCreate extends Component
             ]);
 
             foreach ($this->products as $product) {
+
                 $detail = DetailSales::create([
                     'sales_id' => $sale->id,
                     'product_id' => $product['product_id'],
@@ -93,26 +115,38 @@ class SalesCreate extends Component
 
                 $productToUpdate = Products::find($product['product_id']);
                 if ($productToUpdate) {
-
                     $productToUpdate->stock -= $product['quantity'];
                     $productToUpdate->save();
+                }
+
+                $inventory = InventoryIn::find($product['inventory_in_id']);
+                if ($inventory) {
+                    $inventory->final_stock -= $product['quantity'];
+                    $inventory->save();
+
+                    InventoryOut::create([
+                        'inventory_in_id' => $inventory->id,
+                        'inventory_date' => $this->transaction_date,
+                        'batch_code' => $product['batch_code'],
+                        'shelf_name' => $inventory->shelf_name,
+                        'initial_stock' => $inventory->final_stock,
+                        'stock_sold' => $product['quantity'],
+                        'unit_price' => $inventory->unit_price,
+                    ]);
                 }
             }
 
             DB::commit();
 
             session()->flash('message', 'Sale saved successfully!');
-
             $this->reset();
         } catch (\Exception $e) {
-
             DB::rollBack();
             Log::error('Error saving sale: ' . $e->getMessage());
 
             session()->flash('error', 'There was an error saving the sale: ' . $e->getMessage());
         }
     }
-
 
     public function resetProductForm()
     {

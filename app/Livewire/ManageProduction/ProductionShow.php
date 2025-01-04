@@ -25,7 +25,6 @@ class ProductionShow extends Component
             ->get();
     }
 
-
     public function render()
     {
         return view('livewire.manage-production.production-show');

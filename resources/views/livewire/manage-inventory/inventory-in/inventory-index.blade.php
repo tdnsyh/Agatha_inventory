@@ -3,58 +3,46 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                        </div>
-                    </div>
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4 class="col-auto">{{ $title }} Datatable</h4>
                 </div>
-            </div>
-
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="col-auto">{{ $title }} Datatable</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped" id="table-inventory-in">
-                                <thead>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table-inventory-in">
+                            <thead>
+                                <tr>
+                                    <th>Batch Code</th>
+                                    <th data-type="date">Date</th>
+                                    <th>Product</th>
+                                    <th>Variant</th>
+                                    <th>Price</th>
+                                    <th>Shelf</th>
+                                    <th>Initial Stock</th>
+                                    <th>Final Stock</th>
+                                    <th>Expiration Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($inventoryIn as $item)
                                     <tr>
-                                        <th>Batch Code</th>
-                                        <th data-type="date">Date</th>
-                                        <th>Product</th>
-                                        <th>Variant</th>
-                                        <th>Price</th>
-                                        <th>Shelf</th>
-                                        <th>Initial Stock</th>
-                                        <th>Final Stock</th>
-                                        <th>Expiration Date</th>
+                                        <td>{{ $item->batch_code }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($item->inventory_date)->format('d-m-Y') }}</td>
+                                        <td>{{ $item->product->name ?? 'N/A' }}</td>
+                                        <td>{{ $item->product->variant ?? 'N/A' }}</td>
+                                        <td>Rp. {{ number_format($item->unit_price, 2, ',', '.') }}</td>
+                                        <td>{{ $item->shelf_name }}</td>
+                                        <td>{{ $item->initial_stock }}</td>
+                                        <td>{{ $item->final_stock }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($item->expiration_date)->format('d-m-Y') }}
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($inventoryIn as $item)
-                                        <tr>
-                                            <td>{{ $item->batch_code }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($item->inventory_date)->format('d-m-Y') }}</td>
-                                            <td>{{ $item->product->name ?? 'N/A' }}</td>
-                                            <td>{{ $item->product->variant ?? 'N/A' }}</td>
-                                            <td>Rp. {{ number_format($item->unit_price, 2, ',', '.') }}</td>
-                                            <td>{{ $item->shelf_name }}</td>
-                                            <td>{{ $item->initial_stock }}</td>
-                                            <td>{{ $item->final_stock }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($item->expiration_date)->format('d-m-Y') }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-
         </section>
     </div>
 </div>

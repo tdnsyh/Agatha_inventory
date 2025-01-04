@@ -40,7 +40,6 @@
                                         <th>Price</th>
                                         <th>Expired Day</th>
                                         <th>Stock</th>
-                                        <th>Updated At</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -53,7 +52,6 @@
                                             <td>{{ 'Rp ' . number_format($product->price, 2, ',', '.') }}</td>
                                             <td>{{ $product->expired_day }}</td>
                                             <td>{{ $product->stock }}</td>
-                                            <td>{{ $product->updated_at->format('Y-m-d H:i:s') }}</td>
                                             <td>
                                                 <a href="{{ route('product.show', $product->id) }}"
                                                     class="btn btn-info btn-sm">

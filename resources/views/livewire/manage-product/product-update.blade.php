@@ -3,19 +3,14 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('product.index') }}">
-                                <i class="bi bi-arrow-left"></i>
-                                Back
-                            </a>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('product.index') }}">
+                        <i class="bi bi-arrow-left"></i>
+                        Back
+                    </a>
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-body">
                     @if (session()->has('message'))
@@ -23,9 +18,8 @@
                             {{ session('message') }}
                         </div>
                     @endif
-
                     <form wire:submit.prevent="updateProduct">
-                        <div class="row row-cols-1 row-cols-2">
+                        <div class="row row-cols-1 row-cols-md-2">
                             <div class="col">
                                 <div class="form-group">
                                     @if ($imagePath)

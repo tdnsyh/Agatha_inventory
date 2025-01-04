@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id', 20);
             $table->unsignedBigInteger('inventory_in_id');
             $table->date('inventory_date');
-            $table->integer('batch_code');
+            $table->string('batch_code');
             $table->string('shelf_name');
             $table->integer('initial_stock');
             $table->integer('stock_sold')->nullable();

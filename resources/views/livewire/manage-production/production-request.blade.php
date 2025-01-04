@@ -3,71 +3,59 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                        </div>
-                    </div>
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4 class="col-auto">{{ $title }} Datatable</h4>
                 </div>
-            </div>
-
-            <div class="col-12">
-                <div class="card ">
-                    <div class="card-header">
-                        <h4 class="col-auto">{{ $title }} Datatable</h4>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-striped" id="table-production">
-                            <thead>
+                <div class="card-body">
+                    <table class="table table-striped" id="table-production">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Product Code</th>
+                                <th>Product Name</th>
+                                <th>Quantity Request</th>
+                                <th data-type="date">Production Request Date</th>
+                                <th>Status Request</th>
+                                <th>Note</th>
+                                <th data-sortable="false">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($productionRequests as $request)
                                 <tr>
-                                    <th>User</th>
-                                    <th>Product Code</th>
-                                    <th>Product Name</th>
-                                    <th>Quantity Request</th>
-                                    <th data-type="date">Production Request Date</th>
-                                    <th>Status Request</th>
-                                    <th>Note</th>
-                                    <th data-sortable="false">Action</th>
+                                    <td>{{ $request->user->full_name }}</td>
+                                    <td>{{ $request->product->code }}</td>
+                                    <td>{{ $request->product->name }}</td>
+                                    <td>{{ $request->quantity_request }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($request->production_date)->format('d-m-Y') }}
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="badge bg-{{ $this->getStatusBadgeClass($request->status_request) }}">
+                                            {{ $request->status_request }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $request->note ?? '-' }}</td>
+                                    <td>
+                                        @if (
+                                            !(
+                                                $request->status_request == 'In Progress' ||
+                                                $request->status_request == 'Complete' ||
+                                                $request->status_request == 'Cancelled'
+                                            ))
+                                            <a class="btn btn-sm btn-primary"
+                                                href="{{ route('production.request.create', ['productionRequestId' => $request->id]) }}">
+                                                Make Production
+                                            </a>
+                                        @endif
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($productionRequests as $request)
-                                    <tr>
-                                        <td>{{ $request->user->full_name }}</td>
-                                        <td>{{ $request->product->code }}</td>
-                                        <td>{{ $request->product->name }}</td>
-                                        <td>{{ $request->quantity_request }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($request->production_date)->format('d-m-Y') }}
-                                        </td>
-                                        <td>
-                                            <span
-                                                class="badge bg-{{ $this->getStatusBadgeClass($request->status_request) }}">
-                                                {{ $request->status_request }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $request->note ?? '-' }}</td>
-                                        <td>
-                                            @if (
-                                                !(
-                                                    $request->status_request == 'In Progress' ||
-                                                    $request->status_request == 'Complete' ||
-                                                    $request->status_request == 'Cancelled'
-                                                ))
-                                                <a class="btn btn-sm btn-primary"
-                                                    href="{{ route('production.request.create', ['productionRequestId' => $request->id]) }}">
-                                                    Make Production
-                                                </a>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
         </section>
     </div>
 </div>

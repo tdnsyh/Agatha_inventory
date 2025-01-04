@@ -3,26 +3,11 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <a class="btn icon icon-left btn-lg btn-primary"
-                                href="{{ route('inventory.request.index') }}">
-                                <i class="bi bi-arrow-left"></i>
-                                Back
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @if (session()->has('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
-            @endif
-
-            <div class="card">
+            <a class="btn icon icon-left btn-secondary mt-3" href="{{ route('inventory.request.index') }}">
+                <i class="bi bi-arrow-left"></i>
+                Back
+            </a>
+            <div class="card mt-3">
                 <div class="card-body">
                     <form wire:submit.prevent="submitRequest">
                         <div class="form-group">
@@ -30,7 +15,8 @@
                             <select wire:model="product_id" class="form-control" id="product" required>
                                 <option value="">Select Product</option>
                                 @foreach ($products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                    <option value="{{ $product->id }}">{{ $product->name }} - {{ $product->variant }}
+                                    </option>
                                 @endforeach
                             </select>
                             @error('product_id')

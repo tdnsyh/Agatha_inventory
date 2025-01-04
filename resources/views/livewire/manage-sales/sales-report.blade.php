@@ -3,66 +3,58 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-12 col-md-auto">
-                                    <input class="form-control form-control-lg flatpickr" type="date"
-                                        wire:model="start_date" placeholder="Select Start Date">
-                                </div>
-                                <div class="col-12 col-md-auto">
-                                    <input class="form-control form-control-lg flatpickr" type="date"
-                                        wire:model="end_date" placeholder="Select End date">
-                                </div>
-                                <a class="col-12 col-md-auto btn icon icon-left btn-lg btn-primary"
-                                    wire:click="generateReport">
-                                    <i class="bi bi-journal-bookmark"></i> Generate Sales Report
-                                </a>
-                            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-auto">
+                            <input class="form-control form-control-lg flatpickr" type="date" wire:model="start_date"
+                                placeholder="Select Start Date">
                         </div>
+                        <div class="col-12 col-md-auto">
+                            <input class="form-control form-control-lg flatpickr" type="date" wire:model="end_date"
+                                placeholder="Select End date">
+                        </div>
+                        <a class="col-12 col-md-auto btn icon icon-left btn-lg btn-primary" wire:click="generateReport">
+                            <i class="bi bi-journal-bookmark"></i> Generate Sales Report
+                        </a>
                     </div>
                 </div>
-
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="col-auto">{{ $title ?? 'Sales Report' }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="table-priority-analysis">
-                                    <thead>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="col-auto">{{ $title ?? 'Sales Report' }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="table-priority-analysis">
+                            <thead>
+                                <tr>
+                                    <th>Product Code</th>
+                                    <th>Product Name</th>
+                                    <th>Variant</th>
+                                    <th>Transaction Date</th>
+                                    <th>Price Product</th>
+                                    <th>Quantity</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($sales as $sale)
+                                    @foreach ($sale->details as $detail)
                                         <tr>
-                                            <th>Product Code</th>
-                                            <th>Product Name</th>
-                                            <th>Variant</th>
-                                            <th>Transaction Date</th>
-                                            <th>Price Product</th>
-                                            <th>Quantity</th>
-                                            <th>Total Price</th>
+                                            <td>{{ $detail->product->code }}</td>
+                                            <td>{{ $detail->product->name }}</td>
+                                            <td>{{ $detail->product->variant }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($sale->transaction_date)->format('d-m-Y') }}
+                                            </td>
+                                            <td>Rp. {{ number_format($detail->unit_price, 2) }}</td>
+                                            <td>{{ $detail->quantity }}</td>
+                                            <td>Rp. {{ number_format($detail->sub_total, 2) }}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($sales as $sale)
-                                            @foreach ($sale->details as $detail)
-                                                <tr>
-                                                    <td>{{ $detail->product->code }}</td>
-                                                    <td>{{ $detail->product->name }}</td>
-                                                    <td>{{ $detail->product->variant }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($sale->transaction_date)->format('d-m-Y') }}
-                                                    </td>
-                                                    <td>Rp. {{ number_format($detail->unit_price, 2) }}</td>
-                                                    <td>{{ $detail->quantity }}</td>
-                                                    <td>Rp. {{ number_format($detail->sub_total, 2) }}</td>
-                                                </tr>
-                                            @endforeach
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                    @endforeach
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

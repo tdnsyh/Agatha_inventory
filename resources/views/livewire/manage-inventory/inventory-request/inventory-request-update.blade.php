@@ -3,20 +3,14 @@
         {{-- Page-Title --}}
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <section class="section">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <a class="btn icon icon-left btn-lg btn-primary"
-                                href="{{ route('inventory.request.index') }}">
-                                <i class="bi bi-arrow-left"></i>
-                                Back
-                            </a>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('inventory.request.index') }}">
+                        <i class="bi bi-arrow-left"></i>
+                        Back
+                    </a>
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Edit Production Request</h4>
@@ -62,7 +56,6 @@
                     </form>
                 </div>
             </div>
-
         </section>
     </div>
 </div>
