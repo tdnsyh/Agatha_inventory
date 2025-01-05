@@ -8,8 +8,8 @@
                 <div class="col-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Total Product [Agustus 2024]</h5>
-                            <h1 class="card-text">0</h1>
+                            <h5 class="card-title">Total Product</h5>
+                            <h1 class="card-text">{{ $totalProducts }}</h1>
                         </div>
                     </div>
                 </div>
@@ -17,8 +17,8 @@
                 <div class="col-12 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Total Transaction [Agustus 2024]</h5>
-                            <h1 class="card-text">0</h1>
+                            <h5 class="card-title">Total Transaction</h5>
+                            <h1 class="card-text">Rp. {{ number_format($totalTransactions, 0, ',', '.') }}</h1>
                         </div>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Total User</h5>
-                            <h1 class="card-text">0</h1>
+                            <h1 class="card-text">{{ $totalUsers }}</h1>
                         </div>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                             <h4>Sales Chart</h4>
                         </div>
                         <div class="card-body">
-                            <div id="chart-sales"></div>
+                            <canvas id="salesChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
                             <h4>Production Chart</h4>
                         </div>
                         <div class="card-body">
-                            <div id="chart-production"></div>
+                            <canvas id="productionChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -59,15 +59,13 @@
                 <div class="row">
                     <div class="col-12 col-md-6">
                         <div class="card">
-                            <div class="card-header">
-                                <div class="row justify-content-between">
-                                    <h4 class="col-auto">Latest Sales</h4>
-                                    <a class="col-2 btn btn-sm btn-outline-primary"
-                                        href="{{ route('sales.index') }}">More Info</a>
-                                </div>
-                            </div>
                             <div class="card-body">
-                                <div class="table-responsive">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="mb-0">Latest Sales</h4>
+                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('sales.index') }}">More
+                                        Info</a>
+                                </div>
+                                <div class="table-responsive mt-3">
                                     <table class="table table-striped" id="table-sales">
                                         <thead>
                                             <tr>
@@ -78,59 +76,31 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>User Sales 01</td>
-                                                <td>01-12-2024</td>
-                                                <td>Rp. 50.000</td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>User Sales 02</td>
-                                                <td>01-12-2024</td>
-                                                <td>Rp. 50.000</td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>User Sales 03</td>
-                                                <td>01-12-2024</td>
-                                                <td>Rp. 50.000</td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>User Sales 04</td>
-                                                <td>01-12-2024</td>
-                                                <td>Rp. 50.000</td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>User Sales 05</td>
-                                                <td>01-12-2024</td>
-                                                <td>Rp. 50.000</td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
+                                            @foreach ($latestSales as $sale)
+                                                <tr>
+                                                    <td>{{ $sale->user->full_name }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($sale->transaction_date)->format('d-m-Y') }}
+                                                    </td>
+                                                    <td>Rp. {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
+                                                    <td><a class="btn btn-sm btn-info" href="#"><i
+                                                                class="bi bi-eye"></i></a></td>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-12 col-md-6">
                         <div class="card">
-                            <div class="card-header">
-                                <div class="row justify-content-between">
-                                    <h4 class="col-auto">Latest Production</h4>
-                                    <a class="col-2 btn btn-sm btn-outline-primary"
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="mb-0">Latest Production</h4>
+                                    <a class="btn btn-sm btn-outline-primary"
                                         href="{{ route('production.index') }}">More Info</a>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
+                                <div class="table-responsive mt-3">
                                     <table class="table table-striped" id="table-production">
                                         <thead>
                                             <tr>
@@ -141,41 +111,18 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>User Production 01</td>
-                                                <td>01-12-2024</td>
-                                                <td><span class="badge bg-warning">In Progress</span></td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>User Production 02</td>
-                                                <td>01-12-2024</td>
-                                                <td><span class="badge bg-info">Complete</span></td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>User Production 03</td>
-                                                <td>01-12-2024</td>
-                                                <td><span class="badge bg-danger">Cancelled</span></td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>User Production 04</td>
-                                                <td>01-12-2024</td>
-                                                <td><span class="badge bg-info">Complete</span></td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td>User Production 05</td>
-                                                <td>01-12-2024</td>
-                                                <td><span class="badge bg-info">Complete</span></td>
-                                                <td><a class="btn btn-sm btn-info" href="#"><i
-                                                            class="bi bi-eye"></i></a></td>
-                                            </tr>
+                                            @foreach ($latestProductions as $production)
+                                                <tr>
+                                                    <td>{{ $production->user->full_name }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($production->production_date)->format('d-m-Y') }}
+                                                    </td>
+                                                    <td><span
+                                                            class="badge bg-{{ $production->production_status == 'Complete' ? 'info' : ($production->production_status == 'In Progress' ? 'warning' : 'danger') }}">{{ $production->production_status }}</span>
+                                                    </td>
+                                                    <td><a class="btn btn-sm btn-info" href="#"><i
+                                                                class="bi bi-eye"></i></a></td>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -183,9 +130,89 @@
                         </div>
                     </div>
                 </div>
+            </div>
         </section>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('livewire:load', function() {
+        const productionData = @json($productionData);
+        const salesData = @json($salesData);
+
+        console.log("Production Data:", productionData);
+        console.log("Sales Data:", salesData);
+
+        // Production Chart Data
+        const productionLabels = productionData.map(data => data.date);
+        const productionCounts = productionData.map(data => data.production_count);
+
+        const productionCtx = document.getElementById('productionChart').getContext('2d');
+        new Chart(productionCtx, {
+            type: 'line',
+            data: {
+                labels: productionLabels,
+                datasets: [{
+                    label: 'Production',
+                    data: productionCounts,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Count'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Sales Chart Data
+        const salesLabels = salesData.map(data => data.date);
+        const totalSales = salesData.map(data => data.total_sales);
+
+        const salesCtx = document.getElementById('salesChart').getContext('2d');
+        new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: salesLabels,
+                datasets: [{
+                    label: 'Sales',
+                    data: totalSales,
+                    borderColor: 'rgb(153, 102, 255)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Amount'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 
 @push('styles-priority')
     <link href="{{ asset('storage/assets/extensions/simple-datatables/style.css') }}" rel="stylesheet">

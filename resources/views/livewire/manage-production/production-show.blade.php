@@ -59,7 +59,6 @@
                                     <th data-type="date">Expiration Date</th>
                                     <th>Stock Produced</th>
                                     <th>Shelf Name</th>
-                                    <th data-sortable="false">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -74,7 +73,6 @@
                                         <td>{{ $detail->expiration_date }}</td>
                                         <td>{{ $detail->quantity_produced }}</td>
                                         <td>{{ $detail->shelf_name ?? '-' }}</td>
-                                        <td><a class="btn btn-primary" href="#">Show Barcode</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
