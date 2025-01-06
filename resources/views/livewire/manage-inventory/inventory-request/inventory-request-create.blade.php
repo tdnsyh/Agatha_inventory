@@ -8,49 +8,85 @@
                 <i class="bi bi-arrow-left"></i>
                 Back
             </a>
-            <div class="card mt-3">
-                <div class="card-body">
-                    <form wire:submit.prevent="submitRequest">
-                        <div class="form-group">
-                            <label for="product">Product</label>
-                            <select wire:model="product_id" class="form-control" id="product" required>
-                                <option value="">Select Product</option>
-                                @foreach ($products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }} - {{ $product->variant }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('product_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
 
-                        <div class="form-group">
-                            <label for="request_date">Request Date</label>
-                            <input type="date" wire:model="request_date" class="form-control" id="request_date"
-                                required>
-                            @error('request_date')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
+            <div class="mt-3">
+                <form wire:submit.prevent="saveProduction">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="request_date" class="form-label">Request Date</label>
+                                <input type="date" class="form-control" id="request_date" wire:model="request_date">
+                                @error('request_date')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
 
-                        <div class="form-group">
-                            <label for="quantity_request">Quantity</label>
-                            <input type="number" wire:model="quantity_request" class="form-control"
-                                id="quantity_request" required>
-                            @error('quantity_request')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
+                            <div class="mb-3">
+                                <label for="products" class="form-label">Select Product</label>
+                                <select wire:model="selectedProductId" class="form-control" id="products">
+                                    <option value="">Select a Product</option>
+                                    @foreach ($allProducts as $product)
+                                        <option value="{{ $product->id }}">{{ $product->name }} -
+                                            {{ $product->variant }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('selectedProductId')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
 
-                        <div class="form-group">
-                            <label for="note">Note (optional)</label>
-                            <textarea wire:model="note" class="form-control" id="note"></textarea>
-                        </div>
+                            <div class="mb-3">
+                                <label for="selected_quantity" class="form-label">Quantity</label>
+                                <input type="number" wire:model="selectedQuantity" class="form-control"
+                                    id="selected_quantity" min="1">
+                                @error('selectedQuantity')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
 
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
+                            <button type="button" class="btn btn-primary" wire:click="addProduct">
+                                Add Product
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            @if (count($products) > 0)
+                                <h4>Selected Products</h4>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Product Name</th>
+                                                <th>Variant</th>
+                                                <th>Quantity</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($products as $index => $product_id)
+                                                <tr>
+                                                    <td>{{ $allProducts->find($product_id)->name }}</td>
+                                                    <td>{{ $allProducts->find($product_id)->variant }}</td>
+                                                    <td>{{ $quantities[$index] }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger btn-sm"
+                                                            wire:click="removeProduct({{ $index }})">
+                                                            Remove
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+
+                            <button type="submit" class="btn btn-success">Save Production</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </section>
     </div>

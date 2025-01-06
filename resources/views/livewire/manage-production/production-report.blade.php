@@ -6,83 +6,96 @@
         <section class="section">
             <div class="card">
                 <div class="card-body">
-                    <form wire:submit.prevent="generateReport">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-auto">
-                                <input wire:model="startDate" class="form-control form-control-lg flatpickr" type="date"
-                                    placeholder="Select Start Date">
-                            </div>
-                            <div class="col-12 col-md-auto">
-                                <input wire:model="endDate" class="form-control form-control-lg flatpickr"
-                                    type="date" placeholder="Select End Date">
-                            </div>
-                            <div class="col-12 col-md-auto">
-                                <button type="submit" class="btn icon icon-left btn-lg btn-primary">
-                                    <i class="bi bi-journal-bookmark"></i> Generate Production Report
-                                </button>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" class="form-select" wire:model="status">
+                                <option value="">All</option>
+                                <option value="waiting for response">Waiting for Response</option>
+                                <option value="in progress">In Progress</option>
+                                <option value="complete">Complete</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
                         </div>
-                    </form>
+
+                        <div class="col-md-3">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" id="start_date" class="form-control" wire:model="start_date" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" id="end_date" class="form-control" wire:model="end_date" />
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button class="btn btn-primary" wire:click="loadProductions">Filter</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <div class="card">
-                <div class="card-header">
-                    <h4 class="col-auto">Production Report</h4>
-                    <button id="exportExcel" class="btn btn-outline-success">Export to Excel</button>
-                </div>
                 <div class="card-body">
+                    <div class="mb-3">
+                        <button class="btn btn-success" id="downloadExcel">Download Excel</button>
+                    </div>
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table-production-report">
+                        <table class="table" id="production-table">
                             <thead>
                                 <tr>
-                                    <th>Batch Code Production</th>
-                                    <th>Product Code</th>
-                                    <th>Product Name</th>
-                                    <th>Variant</th>
+                                    <th>#</th>
+                                    <th>Production ID</th>
+                                    <th>Status</th>
                                     <th>Production Date</th>
+                                    <th>Request Date</th>
+                                    <th>Note</th>
+                                    <th>Batch Code</th>
+                                    <th>Shelf Name</th>
+                                    <th>Quantity Produced</th>
                                     <th>Expiration Date</th>
-                                    <th>Stock Produced</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($productionReport as $report)
-                                    <tr>
-                                        <td>{{ $report->batch_code }}</td>
-                                        <td>{{ $report->product->code }}</td>
-                                        <td>{{ $report->product->name }}</td>
-                                        <td>{{ $report->product->variant }}</td>
-                                        <td>{{ $report->created_at->format('d-m-Y') }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($report->expiration_date)->format('d-m-Y') }}
-                                        </td>
-                                        <td>{{ $report->quantity_produced }}</td>
-                                    </tr>
+                                @foreach ($productions as $production)
+                                    @foreach ($production->details as $detail)
+                                        <tr>
+                                            <td>{{ $loop->parent->iteration }}.{{ $loop->iteration }}</td>
+                                            <td>{{ $production->id }}</td>
+                                            <td>{{ ucfirst($production->status) }}</td>
+                                            <td>{{ $production->production_date }}</td>
+                                            <td>{{ $production->request_date }}</td>
+                                            <td>{{ $production->note }}</td>
+                                            <td>{{ $detail->batch_code }}</td>
+                                            <td>{{ $detail->shelf_name }}</td>
+                                            <td>{{ $detail->quantity_produced }}</td>
+                                            <td>{{ $detail->expiration_date }}</td>
+                                        </tr>
+                                    @endforeach
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+
+            @if ($productions->isEmpty())
+                <p>No records found for the selected filters.</p>
+            @endif
         </section>
     </div>
 </div>
 <script>
-    document.getElementById('exportExcel').addEventListener('click', function() {
-        var table = document.getElementById('table-production-report');
-
-        var wb = XLSX.utils.table_to_book(table, {
+    document.getElementById('downloadExcel').addEventListener('click', function() {
+        let table = document.querySelector('table');
+        let wb = XLSX.utils.table_to_book(table, {
             sheet: "Production Report"
         });
 
-        var now = new Date();
-        var options = {
-            timeZone: 'Asia/Jakarta',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-        };
-        var formatter = new Intl.DateTimeFormat('en-GB', options);
-        var formattedDateTime = formatter.format(now).replace(/[\s,:/]/g, '-');
-        var fileName = `Production_Report_${formattedDateTime}.xlsx`;
+        let currentDate = new Date();
+        let formattedDate = currentDate.toISOString().split('T')[0];
+
+        let fileName = 'Production_Report_' + formattedDate + '.xlsx';
 
         XLSX.writeFile(wb, fileName);
     });

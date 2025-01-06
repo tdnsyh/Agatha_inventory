@@ -12,81 +12,100 @@
                     </a>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <form wire:submit.prevent="saveProduction">
-                                <div class="form-group">
-                                    <label>Production Request ID</label>
-                                    <input type="text" class="form-control" value="{{ $productionRequest->id }}"
-                                        disabled>
+            <form wire:submit.prevent="save">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Update Production</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row row-cols-1 row-cols-md-3">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="production_id" class="form-label">ID Request</label>
+                                    <input type="text" class="form-control" id="production_id"
+                                        value="{{ $production->id }}" readonly>
                                 </div>
-                                <div class="form-group">
-                                    <label>Production Request By</label>
-                                    <input type="text" class="form-control"
-                                        value="{{ $productionRequest->user->full_name }}" disabled>
+                            </div>
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="inventory_user_id" class="form-label">Inventory User ID</label>
+                                    <input type="text" class="form-control" id="inventory_user_id"
+                                        value="{{ $production->inventoryUser->full_name }}" readonly>
                                 </div>
-                                <div class="form-group">
-                                    <label>Production Date</label>
-                                    <input type="date" wire:model="production_date" class="form-control">
-                                    @error('production_date')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
+                            </div>
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="production_user_id" class="form-label">Production User ID</label>
+                                    <input type="text" class="form-control" id="production_user_id"
+                                        value="{{ $production_user_id }}" readonly>
                                 </div>
-                                <div class="form-group">
-                                    <label>Production Status</label>
-                                    <select wire:model="production_status" class="form-control">
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Complete">Complete</option>
-                                        <option value="Cancelled">Cancelled</option>
-                                    </select>
-                                    @error('production_status')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <div class="form-group">
-                                    <label>Note</label>
-                                    <textarea wire:model="note" class="form-control"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label>Shelf Name</label>
-                                    <input type="text" wire:model="shelf_name" class="form-control">
-                                </div>
-                                <button type="submit" class="btn btn-primary">Save Production</button>
-                            </form>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="request_date" class="form-label">Request Date</label>
+                            <input type="date" class="form-control" id="request_date"
+                                value="{{ $production->request_date }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select id="status" class="form-select" wire:model="status">
+                                <option value="" selected>Select a status</option>
+                                <option value="in progress">In Progress</option>
+                                <option value="complete">Complete</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shelf_name" class="form-label">Shelf Name</label>
+                            <input type="text" class="form-control" id="shelf_name" wire:model="shelf_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="production_date" class="form-label">Production Date</label>
+                            <input type="date" class="form-control" wire:model="production_date">
+                        </div>
+                        <div class="mb-3">
+                            <label for="note" class="form-label">Note</label>
+                            <textarea class="form-control" id="note" wire:model="note"></textarea>
+                        </div>
+                        <div class="btr">
+                            <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="card">
+            </form>
+            @if (session()->has('error'))
+                <div class="alert alert-success mt-3">
+                    {{ session('error') }}
+                </div>
+            @endif
+            <div class="card mt-4">
                 <div class="card-body">
-                    <div class="col-124">
-                        <h3>Data Request Production</h3>
-                        <div class="table-responsive">
-                            <table class="table table-striped" id="table-detail-production">
-                                <thead>
+                    <h4>Detail Request Production</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Variant</th>
+                                    <th>Batch Code</th>
+                                    <th>Shelf Name</th>
+                                    <th>Quantity Produced</th>
+                                    <th>Expiration Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($details as $detail)
                                     <tr>
-                                        <th>Code Product</th>
-                                        <th>Name Product</th>
-                                        <th>Variant Product</th>
-                                        <th>Price Product</th>
-                                        <th data-type="date">Expiration Day</th>
+                                        <td>{{ $detail->product->name }}</td>
+                                        <td>{{ $detail->product->variant }}</td>
+                                        <td>{{ $detail->batch_code }}</td>
+                                        <td>{{ $detail->shelf_name }}</td>
+                                        <td>{{ $detail->quantity_produced }}</td>
+                                        <td>{{ $detail->expiration_date }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($products as $product)
-                                        <tr>
-                                            <td>{{ $product->code }}</td>
-                                            <td>{{ $product->name }}</td>
-                                            <td>{{ $product->variant }}</td>
-                                            <td>{{ number_format($product->price, 0, ',', '.') }}</td>
-                                            <td>{{ $product->expired_day }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

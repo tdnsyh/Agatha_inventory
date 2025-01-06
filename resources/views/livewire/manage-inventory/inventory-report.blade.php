@@ -5,7 +5,7 @@
         <section class="section">
             <div class="card">
                 <div class="card-body">
-                    <form action="#">
+                    <form wire:submit.prevent="filterDate">
                         <div class="row g-3">
                             <div class="col-12 col-md-auto">
                                 <input wire:model="startDate" class="form-control form-control-lg flatpickr" type="date"
@@ -15,10 +15,11 @@
                                 <input wire:model="endDate" class="form-control form-control-lg flatpickr"
                                     type="date" placeholder="Select End Date">
                             </div>
-                            <button wire:click.prevent="render"
-                                class="col-12 col-md-auto btn icon icon-left btn-lg btn-primary">
-                                <i class="bi bi-journal-bookmark"></i> Generate Sales Report
-                            </button>
+                            <div class="col-12 col-md-auto">
+                                <button type="submit" class="col-12 col-md-auto btn icon icon-left btn-lg btn-primary">
+                                    <i class="bi bi-journal-bookmark"></i> Generate Report
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -26,7 +27,7 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">{{ $title }} Datatable</h5>
+                    <h5 class="card-title">Inventory Report</h5>
                 </div>
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -40,6 +41,7 @@
                         </li>
                     </ul>
                     <div class="tab-content">
+                        <!-- Inventory IN Tab -->
                         <div class="tab-pane fade show active" id="report-inventory-in" role="tabpanel">
                             <div class="table-responsive mt-4">
                                 <button id="exportInventoryInButton" class="btn icon icon-left mb-3 btn-success">
@@ -60,11 +62,11 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($inventoryInReports as $report)
+                                        @foreach ($inventoryIn as $report)
                                             <tr>
                                                 <td>{{ $report->batch_code }}</td>
                                                 <td>{{ $report->inventory_date }}</td>
-                                                <td>{{ $report->product->name ?? 'm' }}</td>
+                                                <td>{{ $report->product->name ?? 'No Product' }}</td>
                                                 <td>{{ $report->product->variant ?? 'No Variant' }}</td>
                                                 <td>{{ number_format($report->unit_price, 2) }}</td>
                                                 <td>{{ $report->shelf_name }}</td>
@@ -79,6 +81,7 @@
                             </div>
                         </div>
 
+                        <!-- Inventory OUT Tab -->
                         <div class="tab-pane fade" id="report-inventory-out" role="tabpanel">
                             <div class="table-responsive mt-4">
                                 <button id="exportInventoryOutButton" class="btn icon icon-left mb-3 btn-info">
@@ -98,12 +101,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($inventoryOutReports as $report)
+                                        @foreach ($inventoryOut as $report)
                                             <tr>
                                                 <td>{{ $report->batch_code }}</td>
                                                 <td>{{ $report->inventory_date }}</td>
-                                                <td>{{ $report->product ? $report->product->name : 'No Product' }}</td>
-                                                <td>{{ $report->product->variant ?? 'No Variant' }}</td>
+                                                <td>{{ $report->inventoryIn->product->name ?? 'No Product' }}</td>
+                                                <td>{{ $report->inventoryIn->product->variant ?? 'No Variant' }}</td>
                                                 <td>{{ number_format($report->unit_price, 2) }}</td>
                                                 <td>{{ $report->shelf_name }}</td>
                                                 <td>{{ $report->initial_stock }}</td>

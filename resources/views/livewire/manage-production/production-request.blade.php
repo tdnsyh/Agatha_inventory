@@ -9,52 +9,59 @@
                     <h4 class="col-auto">{{ $title }} Datatable</h4>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped" id="table-production">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Product Code</th>
-                                <th>Product Name</th>
-                                <th>Quantity Request</th>
-                                <th data-type="date">Production Request Date</th>
-                                <th>Status Request</th>
-                                <th>Note</th>
-                                <th data-sortable="false">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($productionRequests as $request)
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $request->user->full_name }}</td>
-                                    <td>{{ $request->product->code }}</td>
-                                    <td>{{ $request->product->name }}</td>
-                                    <td>{{ $request->quantity_request }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($request->production_date)->format('d-m-Y') }}
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="badge bg-{{ $this->getStatusBadgeClass($request->status_request) }}">
-                                            {{ $request->status_request }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $request->note ?? '-' }}</td>
-                                    <td>
-                                        @if (
-                                            !(
-                                                $request->status_request == 'In Progress' ||
-                                                $request->status_request == 'Complete' ||
-                                                $request->status_request == 'Cancelled'
-                                            ))
-                                            <a class="btn btn-sm btn-primary"
-                                                href="{{ route('production.request.create', ['productionRequestId' => $request->id]) }}">
-                                                Make Production
-                                            </a>
-                                        @endif
-                                    </td>
+                                    <th>Inventory User</th>
+                                    <th>Request ID</th>
+                                    <th>Request Date</th>
+                                    <th>Status</th>
+                                    <th>Note</th>
+                                    <th>Action</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($productions as $production)
+                                    <tr>
+                                        <td>{{ $production->inventoryUser->full_name ?? 'N' }}</td>
+                                        <td>{{ $production->id }}</td>
+                                        <td>{{ $production->request_date }}</td>
+                                        <td><span
+                                                class="badge bg-{{ $production->status == 'complete'
+                                                    ? 'info'
+                                                    : ($production->status == 'in progress'
+                                                        ? 'warning'
+                                                        : ($production->status == 'waiting for response'
+                                                            ? 'secondary'
+                                                            : ($production->status == 'approved'
+                                                                ? 'success'
+                                                                : 'danger'))) }}">
+                                                {{ $production->status }}
+                                            </span></td>
+                                        <td>{{ $production->note }}</td>
+                                        <td>
+                                            @if ($production->status == 'waiting for response')
+                                                <a href="{{ route('production.request.create', $production->id) }}"
+                                                    class="btn btn-primary btn-sm">
+                                                    <i class="bi bi-play-circle"></i>
+                                                </a>
+                                                <a href="{{ route('production.show', $production->id) }}"
+                                                    class="btn btn-info btn-sm">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            @else
+                                                <a href="{{ route('production.show', $production->id) }}"
+                                                    class="btn btn-info btn-sm">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>

@@ -17,7 +17,7 @@
                     <form wire:submit.prevent="updateProduct">
                         <div class="row row-cols-1 row-cols-md-2">
                             <div class="col">
-                                <div class="form-group">
+                                <div class="form-group ">
                                     @if ($imagePath)
                                         <div class="mt-2">
                                             <img src="{{ Storage::url($imagePath) }}" class="img-fluid rounded">

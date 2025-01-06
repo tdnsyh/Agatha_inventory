@@ -12,13 +12,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('detail_production', function (Blueprint $table) {
-            $table->unsignedBigInteger('id', 20);
+            $table->id();
             $table->unsignedBigInteger('production_id');
             $table->unsignedBigInteger('product_id');
-            $table->string('batch_code')->unique();
+            $table->string('batch_code')->nullable();
             $table->string('shelf_name')->nullable();
             $table->integer('quantity_produced');
-            $table->date('expiration_date');
+            $table->date('expiration_date')->nullable();
             $table->timestamps();
         });
     }

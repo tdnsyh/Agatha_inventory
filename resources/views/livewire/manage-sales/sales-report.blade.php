@@ -26,6 +26,7 @@
                     <h4 class="col-auto">{{ $title ?? 'Sales Report' }}</h4>
                 </div>
                 <div class="card-body">
+                    <button id="exportButton" class="btn btn-success mb-3">Export to Excel</button>
                     <div class="table-responsive">
                         <table class="table table-striped" id="table-priority-analysis">
                             <thead>
@@ -62,6 +63,22 @@
         </section>
     </div>
 </div>
+<script>
+    document.getElementById("exportButton").addEventListener("click", function() {
+        var table = document.getElementById("table-priority-analysis");
+        var today = new Date();
+        var dateString = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+        var filename = "sales_data_" + dateString + ".xlsx";
+
+        var wb = XLSX.utils.table_to_book(table, {
+            sheet: "Sales Data"
+        });
+        XLSX.writeFile(wb, filename);
+    });
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 
 @push('styles-priority')
     <link href="{{ asset('storage/assets/extensions/flatpickr/flatpickr.min.css') }}" rel="stylesheet">

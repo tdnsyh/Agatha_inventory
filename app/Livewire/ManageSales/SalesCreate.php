@@ -43,6 +43,11 @@ class SalesCreate extends Component
         $inventory = InventoryIn::where('batch_code', $this->scan_barcode)->first();
 
         if ($inventory) {
+            if ($inventory->final_stock < $this->quantity) {
+                session()->flash('error', 'Insufficient stock for this batch code.');
+                return;
+            }
+
             $existingProductKey = null;
 
             foreach ($this->products as $index => $product) {

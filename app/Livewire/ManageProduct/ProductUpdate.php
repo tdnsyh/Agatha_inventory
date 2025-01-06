@@ -46,13 +46,11 @@ class ProductUpdate extends Component
         ]);
 
         if ($this->image) {
-
-            if ($this->imagePath) {
-                Storage::delete($this->imagePath);
+            if ($this->imagePath && Storage::disk('public')->exists($this->imagePath)) {
+                Storage::disk('public')->delete($this->imagePath);
             }
 
-            $imageName = time() . '.' . $this->image->extension();
-            $this->imagePath = $this->image->storeAs('public/products', $imageName);
+            $this->imagePath = $this->image->store('images', 'public');
         }
 
         $this->product->update([
@@ -67,6 +65,7 @@ class ProductUpdate extends Component
 
         session()->flash('message', 'Product updated successfully!');
     }
+
     public function render()
     {
         return view('livewire.manage-product.product-update');

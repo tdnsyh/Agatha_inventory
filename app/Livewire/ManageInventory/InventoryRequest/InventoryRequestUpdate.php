@@ -4,7 +4,8 @@ namespace App\Livewire\ManageInventory\InventoryRequest;
 
 use Livewire\Component;
 use Livewire\Attributes\Title;
-use App\Models\ProductionRequest;
+use App\Models\DetailProduction;
+use App\Models\Products;
 
 #[Title('Update Production Request')]
 class InventoryRequestUpdate extends Component
@@ -13,45 +14,43 @@ class InventoryRequestUpdate extends Component
     public $title = "Update Production Request";
     public $text_subtitle = "This page displays the production request data to be changed.";
 
-    public $productionRequest;
-    public $product_id;
-    public $quantity_request;
-    public $request_date;
-    public $note;
+    public $id;
+    public $details = [];
+    public $selectedProductId = [];
+    public $selectedQuantity = [];
 
     protected $rules = [
-        'product_id' => 'required|exists:products,id',
-        'quantity_request' => 'required|integer|min:1',
-        'request_date' => 'required|date',
+        'selectedProductId.*' => 'required|exists:products,id',
+        'selectedQuantity.*' => 'required|integer|min:1',
     ];
 
     public function mount($id)
     {
-        $this->productionRequest = ProductionRequest::findOrFail($id);
-        $this->product_id = $this->productionRequest->product_id;
-        $this->quantity_request = $this->productionRequest->quantity_request;
-        $this->request_date = $this->productionRequest->request_date;
-        $this->note = $this->productionRequest->note;
+        $this->id = $id;
+
+        $this->details = DetailProduction::where('production_id', $this->id)->get();
+        foreach ($this->details as $detail) {
+            $this->selectedProductId[$detail->id] = $detail->product_id;
+            $this->selectedQuantity[$detail->id] = $detail->quantity_produced;
+        }
     }
 
-    public function updateRequest()
+    public function updateDetails()
     {
         $this->validate();
+        foreach ($this->details as $detail) {
+            $detail->update([
+                'product_id' => $this->selectedProductId[$detail->id],
+                'quantity_produced' => $this->selectedQuantity[$detail->id],
+            ]);
+        }
 
-        $this->productionRequest->update([
-            'product_id' => $this->product_id,
-            'quantity_request' => $this->quantity_request,
-            'request_date' => $this->request_date,
-            'note' => $this->note,
-        ]);
-
-        session()->flash('message', 'Production Request updated successfully!');
-        return back();
+        session()->flash('message', 'Details updated successfully!');
     }
-
 
     public function render()
     {
-        return view('livewire.manage-inventory.inventory-request.inventory-request-update');
+        $products = Products::all();
+        return view('livewire.manage-inventory.inventory-request.inventory-request-update', compact('products'));
     }
 }

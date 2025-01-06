@@ -17,12 +17,10 @@ class ProductionShow extends Component
     public $production;
     public $details;
 
-    public function mount($id)
+    public function mount($production)
     {
-        $this->production = Production::with(['productionRequest', 'user'])->findOrFail($id);
-        $this->details = DetailProduction::with('product')
-            ->where('production_id', $id)
-            ->get();
+        $this->production = Production::find($production);
+        $this->details = DetailProduction::where('production_id', $production)->get();
     }
 
     public function render()

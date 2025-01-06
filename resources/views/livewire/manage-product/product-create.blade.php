@@ -63,14 +63,6 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="stock" class="form-label">Stock</label>
-                            <input type="number" id="stock" class="form-control" wire:model="stock">
-                            @error('stock')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
                         <button type="submit" class="btn btn-primary">Save</button>
                     </form>
                 </div>

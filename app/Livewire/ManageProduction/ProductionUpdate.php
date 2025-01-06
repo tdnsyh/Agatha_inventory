@@ -5,6 +5,12 @@ namespace App\Livewire\ManageProduction;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use App\Models\Production;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use App\Models\DetailProduction;
+use App\Models\Products;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 #[Title('Update Production')]
 class ProductionUpdate extends Component
@@ -14,44 +20,108 @@ class ProductionUpdate extends Component
     public $text_subtitle = "This page displays the production data to be changed.";
 
     public $production;
-    public $production_date;
-    public $production_status;
+    public $products;
+    public $status;
     public $note;
-    public $details;
+    public $product_id;
+    public $batch_code;
+    public $shelf_name;
+    public $quantity_produced;
+    public $expiration_date;
+    public $production_user_id;
+    public $productionRequest = [];
+    public $production_date;
 
-    public function mount($id)
+    public function mount($productionId)
     {
-
-        $this->production = Production::with('details.product')->findOrFail($id);
-        $this->production_date = $this->production->production_date;
-        $this->production_status = $this->production->production_status;
+        $this->production = Production::with('details')->findOrFail($productionId);
+        $this->products = Products::all();
+        $this->status = $this->production->status;
         $this->note = $this->production->note;
-        $this->details = $this->production->details;
+        $this->production_user_id = Auth::id();
+        $this->production_date = $this->production->production_date;
+
+        $this->shelf_name = $this->production->details->pluck('shelf_name')->first();
     }
 
-    public function updateProduction()
+    public function updatedStatus($status)
     {
-        $this->validate([
-            'production_date' => 'required|date',
-            'production_status' => 'required|string',
-            'note' => 'nullable|string',
-        ]);
+        Log::info('Status updated: ' . $status);
+        switch ($status) {
+            case 'complete':
+                $this->batch_code = 'BC-' . Str::upper(Str::random(4));
+                break;
 
-        $this->production->update([
-            'production_date' => $this->production_date,
-            'production_status' => $this->production_status,
-            'note' => $this->note,
-        ]);
+            case 'rejected':
+                $this->batch_code = null;
+                break;
 
-        $productionRequest = $this->production->productionRequest;
-        $productionRequest->status_request = $this->production_status;
-        $productionRequest->save();
+            case 'in progress':
+                $this->batch_code = null;
+                break;
+
+            default:
+                $this->batch_code = null;
+                break;
+        }
+    }
+
+    public function save()
+    {
+        $detail = DetailProduction::where('production_id', $this->production->id)->first();
+
+        if (!$detail) {
+            session()->flash('error', 'Detail production tidak ditemukan.');
+            return;
+        }
+
+        if ($this->status === "") {
+            session()->flash('error', 'Please select a valid status.');
+            return;
+        }
+
+        $this->product_id = $detail->product_id;
+        $this->quantity_produced = $detail->quantity_produced;
+
+        $this->production_user_id = Auth::id();
+
+        Production::updateOrCreate(
+            ['id' => $this->production->id],
+            [
+                'status' => $this->status,
+                'note' => $this->note,
+                'production_user_id' => Auth::id(),
+                'production_date' => $this->production_date,
+            ]
+        );
+
+        DetailProduction::updateOrCreate(
+            ['production_id' => $this->production->id, 'product_id' => $this->product_id],
+            [
+                'batch_code' => $this->batch_code,
+                'shelf_name' => $this->shelf_name,
+                'quantity_produced' => $this->quantity_produced,
+                'expiration_date' => $this->calculateExpirationDate(),
+            ]
+        );
 
         session()->flash('message', 'Production updated successfully!');
     }
 
+    protected function calculateExpirationDate()
+    {
+        $product = Products::find($this->product_id);
+
+        if ($product && $this->production_date) {
+            return Carbon::parse($this->production_date)->addDays($product->expired_day);
+        }
+
+        return null;
+    }
+
     public function render()
     {
-        return view('livewire.manage-production.production-update');
+        $details = DetailProduction::where('production_id', $this->production->id)->get();
+        return view('livewire.manage-production.production-update', compact('details'));
     }
 }

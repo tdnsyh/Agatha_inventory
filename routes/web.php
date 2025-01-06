@@ -28,6 +28,7 @@ use App\Livewire\ManageInventory\InventoryIn\InventoryIndex as InventoryInInvent
 use App\Livewire\ManageInventory\InventoryOut\InventoryCreate as InventoryOutInventoryCreate;
 use App\Livewire\ManageInventory\InventoryOut\InventoryIndex as InventoryOutInventoryIndex;
 use App\Livewire\ManageInventory\InventoryReport;
+use App\Livewire\ManageInventory\InventoryRequest\InventoryApproval;
 use App\Livewire\ManageInventory\InventoryRequest\InventoryRequest;
 use App\Livewire\ManageInventory\InventoryRequest\InventoryRequestCreate;
 use App\Livewire\ManageInventory\InventoryRequest\InventoryRequestShow;
@@ -63,11 +64,11 @@ Route::middleware('auth')->group(function () {
 
     // Manage Production
     Route::get('/production/index', ProductionIndex::class)->name('production.index');
-    Route::get('/production/show/{id}', ProductionShow::class)->name('production.show');
+    Route::get('/production/show/{production}', ProductionShow::class)->name('production.show');
     Route::get('/production/create', ProductionCreate::class)->name('production.create');
-    Route::get('/production/{id}/update', ProductionUpdate::class)->name('production.update');
+    Route::get('/production/{productionId}/update', ProductionUpdate::class)->name('production.update');
     Route::get('/production/request', ProductionRequest::class)->name('production.request');
-    Route::get('/production/request/create/{productionRequestId}', ProductionRequestCreate::class)->name('production.request.create');
+    Route::get('/production/request/{productionId}/create', ProductionRequestCreate::class)->name('production.request.create');
     Route::get('/production/report', ProductionReport::class)->name('production.report');
 
     // Manage Sales
@@ -91,13 +92,13 @@ Route::middleware('auth')->group(function () {
     //inventory
     Route::get('/inventory/request', InventoryRequest::class)->name('inventory.request.index');
     Route::get('/inventory/request/create', InventoryRequestCreate::class)->name('inventory.request.create');
-    Route::get('/inventory/request/{id}', InventoryRequestShow::class)->name('inventory.request.show');
-    Route::get('/inventory/request/{id}/edit', InventoryRequestUpdate::class)->name('inventory.request.update');
-    Route::get('/inventory/request/{id}/update-status', InventoryRequestUpdateStatus::class)->name('inventory.request.update-status');
+    Route::get('/inventory/request/{production}/show', InventoryRequestShow::class)->name('inventory.request.show');
+    Route::get('/inventory/request/{id}/update', InventoryRequestUpdate::class)->name('inventory.request.update');
     Route::get('/inventory/report', InventoryReport::class)->name('inventory.report');
 
+
     // Manage Access
-    Route::get('/user/index', UserIndex::class)->name('manage-access.user.index');
+    Route::get('/user/index', UserIndex::class)->name(('manage-access.user.index'));
     Route::get('/user/create', UserCreate::class)->name('manage-access.user.create');
-    Route::get('/user/update', UserUpdate::class)->name('manage-access.user.update');
+    Route::get('/user/{userId}/update', UserUpdate::class)->name('manage-access.user.update');
 });

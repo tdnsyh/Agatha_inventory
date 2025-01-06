@@ -12,14 +12,18 @@ return new class extends Migration
     public function up()
     {
         Schema::create('production', function (Blueprint $table) {
-            $table->unsignedBigInteger('id', 20);
-            $table->unsignedBigInteger('user_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('production_request_id');
-            $table->foreign('production_request_id')->references('id')->on('production_request')->onDelete('cascade');
-            $table->timestamp('production_date');
-            $table->string('production_status');
+            $table->id();
+            $table->unsignedBigInteger('inventory_user_id');
+            $table->unsignedBigInteger('production_user_id')->nullable();
+            $table->date('production_date')->nullable();
+            $table->date('request_date');
+            $table->string('status');
             $table->text('note')->nullable();
+            $table->string('approval')->nullable();
             $table->timestamps();
+
+            $table->foreign('inventory_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('production_user_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

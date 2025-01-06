@@ -14,62 +14,75 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table-request-production">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Product Name</th>
-                                    <th>Quantity Request</th>
-                                    <th data-type="date">Production Request Date</th>
-                                    <th>Status Request</th>
-                                    <th>Note</th>
-                                    <th data-sortable="false">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($productionRequests as $request)
+                        @if ($productions->isEmpty())
+                            <p>No production records found.</p>
+                        @else
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td>{{ $request->user->full_name ?? 'N/A' }}</td>
-                                        <td>{{ $request->product->name ?? 'N/A' }}</td>
-                                        <td>{{ $request->quantity_request }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($request->request_date)->format('d-m-Y') }}
-                                        </td>
-                                        <td>
-                                            @if ($request->status_request == 'Waiting For Response')
-                                                <span class="badge bg-secondary">Waiting for Response</span>
-                                            @elseif ($request->status_request == 'In Progress')
-                                                <span class="badge bg-warning">In Progress</span>
-                                            @elseif ($request->status_request == 'In Progress')
-                                                <span class="badge bg-warning">In Progress</span>
-                                            @elseif ($request->status_request == 'Complete')
-                                                <span class="badge bg-success">Approved</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $request->note ?? '-' }}</td>
-                                        <td>
-                                            @if ($request->status_request == 'Waiting For Response')
-                                                <a class="btn btn-sm btn-warning"
-                                                    href="{{ route('inventory.request.update', $request->id) }}"><i
-                                                        class="bi bi-pencil"></i></a>
-                                                <a class="btn btn-sm btn-danger" href="#"><i
-                                                        class="bi bi-trash"></i></a>
-                                            @elseif ($request->status_request == 'In Progress')
-                                                <a class="btn icon icon-left btn-sm btn-info"
-                                                    href="{{ route('inventory.request.show', $request->id) }}"><i
-                                                        class="bi bi-eye"></i></a>
-                                                <a class="btn icon icon-pencil btn-sm btn-warning"
-                                                    href="{{ route('inventory.request.update-status', $request->id) }}"><i
-                                                        class="bi bi-pencil"></i></a>
-                                            @elseif ($request->status_request == 'in progress' || $request->status_request == 'approved')
-                                                <a class="btn icon icon-left btn-sm btn-info"
-                                                    href="{{ route('inventory.request.show', $request->id) }}"><i
-                                                        class="bi bi-eye"></i></a>
-                                            @endif
-                                        </td>
+                                        <th>Production ID</th>
+                                        <th>Request Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                        <th>Approval</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach ($productions as $production)
+                                        <tr>
+                                            <td>{{ $production->id }}</td>
+                                            <td>{{ $production->request_date }}</td>
+                                            <td><span
+                                                    class="badge bg-{{ $production->status == 'complete'
+                                                        ? 'info'
+                                                        : ($production->status == 'in progress'
+                                                            ? 'warning'
+                                                            : ($production->status == 'waiting for response'
+                                                                ? 'secondary'
+                                                                : ($production->status == 'approved'
+                                                                    ? 'success'
+                                                                    : 'danger'))) }}">
+                                                    {{ $production->status }}
+                                                </span></td>
+                                            <td>
+                                                @if ($production->status == 'complete')
+                                                    <a href="{{ route('inventory.request.show', $production->id) }}"
+                                                        class="btn btn-info btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                @elseif ($production->status == 'waiting for response')
+                                                    <a href="{{ route('inventory.request.show', $production->id) }}"
+                                                        class="btn btn-info btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a href="{{ route('inventory.request.update', $production->id) }}"
+                                                        class="btn btn-warning btn-sm">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('inventory.request.show', $production->id) }}"
+                                                        class="btn btn-warning btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($production->status == 'complete')
+                                                    <button wire:click="approve({{ $production->id }})"
+                                                        class="btn btn-info btn-sm">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                    <button wire:click="quantityMismatch({{ $production->id }})"
+                                                        class="btn btn-danger btn-sm">
+                                                        <i class="bi bi-x-circle"></i>
+                                                    </button>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
                     </div>
                 </div>
             </div>

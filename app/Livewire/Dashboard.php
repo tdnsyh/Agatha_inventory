@@ -22,52 +22,37 @@ class Dashboard extends Component
     public $totalProducts;
     public $totalTransactions;
     public $totalUsers;
-    public $latestSales = [];
-    public $latestProductions = [];
-    public $productionData = [];
-    public $salesData = [];
+    public $latestSales;
+    public $latestProductions;
+    public $productions;
+    public $salesChartData;
+    public $productionChartData;
 
     public function mount()
     {
-        if (!Auth::check()) {
-            return redirect()->route('auth.login');
-        }
+        $salesData = Sales::selectRaw('DATE(transaction_date) as date, SUM(total_amount) as total_sales')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->take(5)
+            ->get();
 
-        $currentMonth = Carbon::now()->month;
-        $currentYear = Carbon::now()->year;
+        $productionData = Production::selectRaw('DATE(production_date) as date, COUNT(*) as total_productions')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->take(5)
+            ->get();
+
+        $this->salesChartData = $salesData;
+        $this->productionChartData = $productionData;
 
         $this->totalProducts = Products::count();
-        $this->totalTransactions = Sales::whereMonth('transaction_date', $currentMonth)
-            ->whereYear('transaction_date', $currentYear)
-            ->sum('total_amount');
+        $this->totalTransactions = Sales::sum('total_amount');
         $this->totalUsers = User::count();
-
-        $this->latestSales = Sales::with('user')
-            ->whereMonth('transaction_date', $currentMonth)
-            ->whereYear('transaction_date', $currentYear)
-            ->latest()
-            ->take(5)
-            ->get();
-
-        $this->latestProductions = Production::with('user')
-            ->latest()
-            ->take(5)
-            ->get();
-
-        $this->productionData = Production::select(DB::raw('DATE(production_date) as date'), DB::raw('count(*) as production_count'))
-            ->groupBy(DB::raw('DATE(production_date)'))
-            ->orderBy('date')
-            ->get();
-
-        logger($this->productionData);
-
-        $this->salesData = Sales::select(DB::raw('DATE(transaction_date) as date'), DB::raw('sum(total_amount) as total_sales'))
-            ->groupBy(DB::raw('DATE(transaction_date)'))
-            ->orderBy('date')
-            ->get();
-
-        logger($this->salesData);
+        $this->latestSales = Sales::with('user')->latest()->take(5)->get();
+        $this->latestProductions = Production::with('user')->latest()->take(5)->get();
+        $this->productions = Production::with('user')->get();
     }
+
 
     public function render()
     {

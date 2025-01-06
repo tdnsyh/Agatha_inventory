@@ -4,71 +4,70 @@
         <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
         <x-partials.alert />
         <section class="section">
-            <div class="card">
-                <div class="card-body">
-                    <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('production.create') }}">
-                        <i class="bi bi-plus"></i>
-                        Add Data Production
-                    </a>
-                </div>
-            </div>
-            <div class="card">
+            <div class="card mt-3">
                 <div class="card-header">
                     <h4 class="col-auto">{{ $title }} Datatable</h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped" id="table-production">
-                            <thead>
-                                <tr>
-                                    <th wire:click="sortBy('user_id')">User</th>
-                                    <th>Production Request</th>
-                                    <th wire:click="sortBy('production_date')" data-type="date">
-                                        Production Date
-                                        @if ($sortField === 'production_date')
-                                            <i
-                                                class="bi {{ $sortDirection === 'asc' ? 'bi-arrow-down' : 'bi-arrow-up' }}"></i>
-                                        @endif
-                                    </th>
-                                    <th wire:click="sortBy('production_status')">Production Status</th>
-                                    <th>Total Product</th>
-                                    <th>Note</th>
-                                    <th data-sortable="false">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($productions as $production)
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td>{{ $production->user->full_name }}</td>
-                                        <td>PR-0{{ $production->production_request_id }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($production->production_date)->format('d-m-Y') }}
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">{{ $production->production_status }}</span>
-                                        </td>
-                                        <td>{{ $production->details->count() }}</td>
-                                        <td>{{ $production->note ?? '-' }}</td>
-                                        <td>
-                                            <a class="btn icon icon-left btn-sm btn-info"
-                                                href="{{ route('production.show', $production->id) }}">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a class="btn icon icon-left btn-sm btn-warning"
-                                                href="{{ route('production.update', $production->id) }}">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                        </td>
+                                        <th>Inventory User</th>
+                                        <th>Request ID</th>
+                                        <th>Request Date</th>
+                                        <th>Status</th>
+                                        <th>Note</th>
+                                        <th>Action</th>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center">No data found.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mt-3">
-                        {{ $productions->links() }}
+                                </thead>
+                                <tbody>
+                                    @foreach ($productions as $production)
+                                        <tr>
+                                            <td>{{ $production->productionUser->full_name ?? 'N' }}</td>
+                                            <td>{{ $production->id }}</td>
+                                            <td>{{ $production->request_date }}</td>
+                                            <td><span
+                                                    class="badge bg-{{ $production->status == 'complete'
+                                                        ? 'info'
+                                                        : ($production->status == 'in progress'
+                                                            ? 'warning'
+                                                            : ($production->status == 'waiting for response'
+                                                                ? 'secondary'
+                                                                : ($production->status == 'approved'
+                                                                    ? 'success'
+                                                                    : 'danger'))) }}">
+                                                    {{ $production->status }}
+                                                </span></td>
+                                            <td>{{ $production->note }}</td>
+                                            <td>
+                                                @if ($production->status == 'complete')
+                                                    <a href="{{ route('production.show', $production->id) }}"
+                                                        class="btn btn-info btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                @elseif ($production->status == 'approved')
+                                                    <a href="{{ route('production.show', $production->id) }}"
+                                                        class="btn btn-info btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('production.update', $production->id) }}"
+                                                        class="btn btn-info btn-sm">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a href="{{ route('production.show', $production->id) }}"
+                                                        class="btn btn-warning btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

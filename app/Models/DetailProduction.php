@@ -19,6 +19,7 @@ class DetailProduction extends Model
         'quantity_produced',
         'expiration_date',
     ];
+
     public function product()
     {
         return $this->belongsTo(Products::class, 'product_id');

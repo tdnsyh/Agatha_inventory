@@ -1,67 +1,76 @@
 <div>
-  <div class="page-heading">
-    {{-- Page-Title --}}
-    <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
-    <section class="section">
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('manage-access.user.index') }}">
-                <i class="bi bi-arrow-left"></i>
-                Back
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-body">
-          <form action="#">
-            <div class="form-group">
-              <label class="form-label">Full Name</label>
-              <input class="form-control" type="text" placeholder="Your Full Name">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Username</label>
-              <input class="form-control" type="text" placeholder="Your Username">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="phone">Role</label>
-              <select class="choices form-select">
-                <option value="" selected>Select Your Role</option>
-                <option value="administrator">Administrator</option>
-                <option value="sales">Sales</option>
-                <option value="production">Production</option>
-                <option value="inventory">Inventory</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="password">Password</label>
-              <input class="form-control" type="password" placeholder="Enter Password">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="confirm_password">Confirm Password</label>
-              <input class="form-control"type="password" placeholder="Enter Confirm Password">
+    <div class="page-heading">
+        {{-- Page-Title --}}
+        <x-partials.page-title :title="$title" :text_subtitle="$text_subtitle" />
+        <x-partials.alert />
+        <section class="section">
+            <div class="card">
+                <div class="card-body">
+                    <a class="btn icon icon-left btn-lg btn-primary" href="{{ route('manage-access.user.index') }}">
+                        <i class="bi bi-arrow-left"></i>
+                        Back
+                    </a>
+                </div>
             </div>
 
-            <div class="form-group">
-              <button class="btn btn-primary" type="submit">Save User</button>
-            </div>
-          </form>
-        </div>
-      </div>
+            <div class="card">
+                <div class="card-body">
+                    <form wire:submit.prevent="store">
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <input type="text" wire:model="full_name" class="form-control" id="full_name" required>
+                            @error('full_name')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
 
-    </section>
-  </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" wire:model="username" class="form-control" id="username" required>
+                            @error('username')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" wire:model="email" class="form-control" id="email" required>
+                            @error('email')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" wire:model="password" class="form-control" id="password" required>
+                            @error('password')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password_confirmation" class="form-label">Confirm Password</label>
+                            <input type="password" wire:model="password_confirmation" class="form-control"
+                                id="password_confirmation" required>
+                            @error('password_confirmation')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create User</button>
+                    </form>
+                </div>
+            </div>
+
+        </section>
+    </div>
 </div>
 
 @push('styles-priority')
-  <link href="{{ asset('storage/assets/extensions/choices.js/public/assets/styles/choices.css') }}" rel="stylesheet">
+    <link href="{{ asset('storage/assets/extensions/choices.js/public/assets/styles/choices.css') }}" rel="stylesheet">
 @endpush
 
 @push('scripts')
-  <script src="{{ asset('storage/assets/extensions/choices.js/public/assets/scripts/choices.js') }}"></script>
-  <script src="{{ asset('storage/assets/static/js/pages/form-element-select.js') }}"></script>
+    <script src="{{ asset('storage/assets/extensions/choices.js/public/assets/scripts/choices.js') }}"></script>
+    <script src="{{ asset('storage/assets/static/js/pages/form-element-select.js') }}"></script>
 @endpush

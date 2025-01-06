@@ -6,7 +6,8 @@ use App\Models\Products;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ProductionRequest;
+use App\Models\Production;
+use App\Models\DetailProduction;
 
 #[Title('Create Request Production')]
 class InventoryRequestCreate extends Component
@@ -15,37 +16,84 @@ class InventoryRequestCreate extends Component
     public $title = "Create Request Production";
     public $text_subtitle = "This page displays for create data request production.";
 
-    public $product_id;
     public $request_date;
-    public $quantity_request;
-    public $note;
+    public $status = 'waiting for response';
+    public $products = [];
+    public $quantities = [];
+    public $inventory_user_id;
+    public $selectedProductId = null;
+    public $selectedQuantity = null;
 
     protected $rules = [
-        'product_id' => 'required|exists:products,id',
         'request_date' => 'required|date',
-        'quantity_request' => 'required|integer|min:1',
+        'products' => 'required|array',
+        'quantities' => 'required|array',
+        'quantities.*' => 'required|integer|min:1',
     ];
 
-    public function submitRequest()
+    public function mount()
+    {
+        $this->inventory_user_id = Auth::id();
+    }
+
+    public function addProduct()
+    {
+        if (!$this->selectedProductId || !$this->selectedQuantity) {
+            session()->flash('error', 'Please select a product and enter a quantity.');
+            return;
+        }
+
+        $productKey = array_search($this->selectedProductId, $this->products);
+
+        if ($productKey !== false) {
+
+            $this->quantities[$productKey] += $this->selectedQuantity;
+        } else {
+            $this->products[] = $this->selectedProductId;
+            $this->quantities[] = $this->selectedQuantity;
+        }
+
+        $this->selectedProductId = null;
+        $this->selectedQuantity = null;
+    }
+
+    public function removeProduct($index)
+    {
+        unset($this->products[$index]);
+        unset($this->quantities[$index]);
+
+        $this->products = array_values($this->products);
+        $this->quantities = array_values($this->quantities);
+    }
+
+    public function saveProduction()
     {
         $this->validate();
 
-        ProductionRequest::create([
-            'id' => 'PR-' . now()->format('Ymd'),
-            'user_id' => Auth::id(),
-            'product_id' => $this->product_id,
+        $status = 'waiting for response';
+
+        $production = Production::create([
+            'inventory_user_id' => $this->inventory_user_id,
             'request_date' => $this->request_date,
-            'quantity_request' => $this->quantity_request,
-            'status_request' => 'Waiting For Response',
-            'note' => $this->note,
+            'status' => $status,
         ]);
 
-        session()->flash('message', 'Production request submitted successfully!');
+        foreach ($this->products as $key => $product_id) {
+            DetailProduction::create([
+                'production_id' => $production->id,
+                'product_id' => $product_id,
+                'quantity_produced' => $this->quantities[$key],
+            ]);
+        }
+
+        $this->reset();
+
+        session()->flash('message', 'Production created successfully!');
     }
 
     public function render()
     {
-        $products = Products::all();
-        return view('livewire.manage-inventory.inventory-request.inventory-request-create', compact('products'));
+        $allProducts = Products::all();
+        return view('livewire.manage-inventory.inventory-request.inventory-request-create', compact('allProducts'));
     }
 }

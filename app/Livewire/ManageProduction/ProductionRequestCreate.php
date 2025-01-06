@@ -8,9 +8,9 @@ use App\Models\Production;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\DetailProduction;
-use App\Models\ProductionRequest;
 use App\Models\Products;
-use App\Models\InventoryIn;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 #[Title('Create Production Request ')]
 class ProductionRequestCreate extends Component
@@ -19,78 +19,107 @@ class ProductionRequestCreate extends Component
     public $title = "Create Production Request";
     public $text_subtitle = "This page displays for create data production.";
 
-    public $productionRequestId;
-    public $productionRequest;
-    public $products = [];
-    public $production_date;
-    public $production_status = 'In Progress';
+    public $production;
+    public $products;
+    public $status;
     public $note;
+    public $product_id;
+    public $batch_code;
     public $shelf_name;
+    public $quantity_produced;
+    public $expiration_date;
+    public $production_user_id;
+    public $productionRequest = [];
+    public $production_date;
 
-    public function mount($productionRequestId)
+    public function mount($productionId)
     {
-        $this->productionRequest = ProductionRequest::with('product', 'user')->findOrFail($productionRequestId);
-        $this->products = [$this->productionRequest->product];
+        $this->production = Production::findOrFail($productionId);
+        $this->products = Products::all();
+        $this->status = $this->production->status;
+        $this->note = $this->production->note;
+        $this->production_user_id = Auth::id();
+        $this->production_date = $this->production->production_date;
     }
 
-    public function saveProduction()
+    public function updatedStatus($status)
     {
-        $this->validate([
-            'production_date' => 'required|date',
-            'production_status' => 'required|string',
-        ]);
+        Log::info('Status updated: ' . $status);
+        switch ($status) {
+            case 'complete':
+                $this->batch_code = 'BC-' . Str::upper(Str::random(4));
+                break;
 
-        $production = Production::create([
-            'production_request_id' => $this->productionRequestId,
-            'production_status' => $this->production_status,
-            'production_date' => $this->production_date,
-            'note' => $this->note,
-            'user_id' => Auth::id(),
-        ]);
+            case 'rejected':
+                $this->batch_code = null;
+                break;
 
-        foreach ($this->products as $product) {
-            $expiredDay = $product->expired_day;
-            $expirationDate = \Carbon\Carbon::parse($this->production_date)->addDays($expiredDay);
+            case 'in progress':
+                $this->batch_code = null;
+                break;
 
-            $batchCode = 'BC-' . strtoupper(Str::random(4));
+            default:
+                $this->batch_code = null;
+                break;
+        }
+    }
 
-            $detailProduction = DetailProduction::create([
-                'production_id' => $production->id,
-                'product_id' => $product->id,
-                'batch_code' => $batchCode,
-                'shelf_name' => $this->shelf_name,
-                'quantity_produced' => $this->productionRequest->quantity_request,
-                'expiration_date' => $expirationDate,
-            ]);
+    public function save()
+    {
+        $detail = DetailProduction::where('production_id', $this->production->id)->first();
 
-            if ($this->production_status === 'Complete') {
-                $productToUpdate = Products::find($product->id);
-                if ($productToUpdate) {
-                    InventoryIn::create([
-                        'product_id' => $product->id,
-                        'inventory_date' => $this->production_date,
-                        'batch_code' => $batchCode,
-                        'shelf_name' => $this->shelf_name,
-                        'initial_stock' => $productToUpdate->stock,
-                        'final_stock' => $productToUpdate->stock + $detailProduction->quantity_produced,
-                        'unit_price' => $productToUpdate->price,
-                        'expiration_date' => $expirationDate,
-                    ]);
-
-                    $productToUpdate->stock += $detailProduction->quantity_produced;
-                    $productToUpdate->save();
-                }
-            }
+        if (!$detail) {
+            session()->flash('error', 'Detail production tidak ditemukan.');
+            return;
         }
 
-        $this->productionRequest->update(['status_request' => $this->production_status]);
-        session()->flash('message', 'Production created successfully!');
+        if ($this->status === "") {
+            session()->flash('error', 'Please select a valid status.');
+            return;
+        }
+
+        $this->product_id = $detail->product_id;
+        $this->quantity_produced = $detail->quantity_produced;
+
+        $this->production_user_id = Auth::id();
+
+        Production::updateOrCreate(
+            ['id' => $this->production->id],
+            [
+                'status' => $this->status,
+                'note' => $this->note,
+                'production_user_id' => Auth::id(),
+                'production_date' => $this->production_date,
+            ]
+        );
+
+        DetailProduction::updateOrCreate(
+            ['production_id' => $this->production->id, 'product_id' => $this->product_id],
+            [
+                'batch_code' => $this->batch_code,
+                'shelf_name' => $this->shelf_name,
+                'quantity_produced' => $this->quantity_produced,
+                'expiration_date' => $this->calculateExpirationDate(),
+            ]
+        );
+
+        session()->flash('message', 'Production updated successfully!');
+    }
+
+    protected function calculateExpirationDate()
+    {
+        $product = Products::find($this->product_id);
+
+        if ($product && $this->production_date) {
+            return Carbon::parse($this->production_date)->addDays($product->expired_day);
+        }
+
+        return null;
     }
 
     public function render()
     {
-        return view('livewire.manage-production.production-request-create', [
-            'productionRequest' => $this->productionRequest,
-        ]);
+        $details = DetailProduction::where('production_id', $this->production->id)->get();
+        return view('livewire.manage-production.production-request-create', compact('details'));
     }
 }

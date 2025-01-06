@@ -11,77 +11,79 @@
                     </a>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Production Request Details</h4>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label class="form-label">Production Request Date</label>
-                        <input class="form-control form-control-lg" type="text"
-                            value="{{ \Carbon\Carbon::parse($productionRequest->request_date)->format('d-m-Y') }}"
-                            readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Production Status Request</label>
-                        <input class="form-control form-control-lg" type="text"
-                            value="@if ($productionRequest->status_request == 'waiting for response') Waiting for Response
-                                        @elseif($productionRequest->status_request == 'in progress') In Progress
-                                        @elseif($productionRequest->status_request == 'pending approval') Pending Approval
-                                        @elseif($productionRequest->status_request == 'approved') Approved
-                                        @elseif($productionRequest->status_request == 'quantity mismatch') Quantity Mismatch @endif"
-                            readonly>
-                    </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Note</label>
-                        <input class="form-control form-control-lg" type="text"
-                            value="{{ $productionRequest->note ?? '-' }}" readonly>
+            @if ($production)
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Production Request Details</h4>
                     </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="table-detail-production">
-                                    <thead>
-                                        <tr>
-                                            <th>Code Product</th>
-                                            <th>Batch Code Production</th>
-                                            <th>Name Product</th>
-                                            <th>Variant Product</th>
-                                            <th>Price Product</th>
-                                            <th data-type="date">Expiration Date</th>
-                                            <th>Stock Produced</th>
-                                            <th data-sortable="false">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($productionRequest->product->batchProductions as $batch)
-                                            <tr>
-                                                <td>{{ $batch->product->code }}</td>
-                                                <td>{{ $batch->batch_code }}</td>
-                                                <td>{{ $batch->product->name }}</td>
-                                                <td>{{ $batch->product->variant }}</td>
-                                                <td>{{ 'Rp. ' . number_format($batch->product->price, 0, ',', '.') }}
-                                                </td>
-                                                <td>{{ \Carbon\Carbon::parse($batch->expiration_date)->format('d-m-Y') }}
-                                                </td>
-                                                <td>{{ $batch->stock_produced }}</td>
-                                                <td>
-                                                    <a class="btn btn-primary" href="#">Show Barcode</a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-md-3"><strong>Production ID:</strong></div>
+                            <div class="col-md-9">{{ $production->id ?? '-' }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3"><strong>Inventory User ID:</strong></div>
+                            <div class="col-md-9">{{ $production->inventory_user_id ?? '-' }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3"><strong>Production User ID:</strong></div>
+                            <div class="col-md-9">{{ $production->production_user_id ?? '-' }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3"><strong>Production Date:</strong></div>
+                            <div class="col-md-9">{{ $production->production_date ?? '-' }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3"><strong>Request Date:</strong></div>
+                            <div class="col-md-9">{{ $production->request_date ?? '-' }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3"><strong>Status:</strong></div>
+                            <div class="col-md-9">{{ $production->status ?? '-' }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3"><strong>Note:</strong></div>
+                            <div class="col-md-9">{{ $production->note ?? '-' }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3"><strong>Approval:</strong></div>
+                            <div class="col-md-9">{{ $production->approval ?? '-' }}</div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Detail Request</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Variant</th>
+                                    <th>Quantity Request</th>
+                                    <th>Batch Code</th>
+                                    <th>Shelf Name</th>
+                                    <th>Expiration Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($details as $detail)
+                                    <tr>
+                                        <td>{{ $detail->product->name ?? '-' }}</td>
+                                        <td>{{ $detail->product->variant ?? '-' }}</td>
+                                        <td>{{ $detail->quantity_produced ?? '-' }}</td>
+                                        <td>{{ $detail->batch_code ?? '-' }}</td>
+                                        <td>{{ $detail->shelf_name ?? '-' }}</td>
+                                        <td>{{ $detail->expiration_date ?? '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <p>Production not found.</p>
+            @endif
+            <div>
         </section>
     </div>
 </div>

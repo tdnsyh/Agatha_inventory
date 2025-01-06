@@ -17,42 +17,30 @@
                     <h4 class="card-title">Edit Production Request</h4>
                 </div>
                 <div class="card-body">
-                    <form wire:submit.prevent="updateRequest">
-                        <div class="form-group">
-                            <label class="form-label">Request Date</label>
-                            <input class="form-control flatpickr" type="date" wire:model="request_date">
-                            @error('request_date')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                    @foreach ($details as $detail)
+                        <div class="mb-3 row">
+                            <div class="col-md-6">
+                                <label for="product-{{ $detail->id }}" class="form-label">Product</label>
+                                <select id="product-{{ $detail->id }}" class="form-control"
+                                    wire:model="selectedProductId.{{ $detail->id }}">
+                                    <option value="">Select Product</option>
+                                    @foreach ($products as $product)
+                                        <option value="{{ $product->id }}"
+                                            {{ $product->id == $detail->product_id ? 'selected' : '' }}>
+                                            {{ $product->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="quantity-{{ $detail->id }}" class="form-label">Quantity Produced</label>
+                                <input type="number" id="quantity-{{ $detail->id }}" class="form-control"
+                                    wire:model="selectedQuantity.{{ $detail->id }}">
+                            </div>
                         </div>
+                    @endforeach
 
-                        <div class="form-group">
-                            <label class="form-label">Product</label>
-                            <select class="form-select" wire:model="product_id">
-                                <option value="" selected>Select Your Product</option>
-                                @foreach (\App\Models\Products::all() as $product)
-                                    <option value="{{ $product->id }}">{{ $product->code }} - {{ $product->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('product_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Quantity -->
-                        <div class="form-group">
-                            <label class="form-label">Quantity</label>
-                            <input class="form-control" type="number" wire:model="quantity_request"
-                                placeholder="Your Quantity">
-                            @error('quantity_request')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-primary" type="submit">Save Changes</button>
-                        </div>
-                    </form>
+                    <button class="btn btn-success mt-3" wire:click="updateDetails">Update Details</button>
                 </div>
             </div>
         </section>

@@ -23,7 +23,7 @@ class InventoryOut extends Model
 
     public function inventoryIn()
     {
-        return $this->belongsTo(InventoryIn::class, 'inventory_in_id');
+        return $this->belongsTo(InventoryIn::class);
     }
 
     public function product()

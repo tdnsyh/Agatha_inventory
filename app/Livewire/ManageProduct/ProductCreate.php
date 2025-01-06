@@ -30,7 +30,14 @@ class ProductCreate extends Component
 
     public function save()
     {
-        $this->validate();
+        $this->validate([
+            'code' => 'required|unique:products,code',
+            'name' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'variant' => 'nullable|string',
+            'price' => 'required|numeric',
+            'expired_day' => 'required|integer',
+        ]);
 
         $imagePath = null;
         if ($this->image) {
@@ -44,12 +51,13 @@ class ProductCreate extends Component
             'variant' => $this->variant,
             'price' => $this->price,
             'expired_day' => $this->expired_day,
-            'stock' => $this->stock,
+            'stock' => 0,
         ]);
 
         session()->flash('message', 'Product successfully created.');
         $this->reset();
     }
+
 
     public function render()
     {
