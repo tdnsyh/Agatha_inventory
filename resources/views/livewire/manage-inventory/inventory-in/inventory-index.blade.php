@@ -17,6 +17,7 @@
                                     <th>Product</th>
                                     <th>Variant</th>
                                     <th>Shelf</th>
+                                    <th>Quantity Produced</th>
                                     <th>Initial Stock</th>
                                     <th>Final Stock</th>
                                     <th>Expiration Date</th>
@@ -32,14 +33,22 @@
                                         <td>{{ $item->product->variant ?? 'N/A' }}</td>
                                         <td>{{ $item->shelf_name }}</td>
                                         <td>{{ $item->initial_stock }}</td>
+                                        <td>{{ $item->quantity_produced ?? 'N/A' }}</td>
                                         <td>{{ $item->final_stock }}</td>
                                         <td>{{ \Carbon\Carbon::parse($item->expiration_date)->format('d-m-Y') }}</td>
                                         <td>
-                                            <a href="javascript:void(0)" class="btn btn-sm btn-primary"
+                                            <a href="javascript:void(0)" class="btn btn-sm btn-primary mb-2"
                                                 data-bs-toggle="modal" data-bs-target="#barcodeModal"
                                                 data-code="{{ $item->batch_code }}">
-                                                Barcode
+                                                Lihat
                                             </a>
+                                            @if ($item->quantity_produced)
+                                                <a href="javascript:void(0)" class="btn btn-sm btn-success"
+                                                    data-code="{{ $item->batch_code }}"
+                                                    data-quantity="{{ $item->quantity_produced }}">
+                                                    Unduh
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -67,6 +76,7 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll('a[data-bs-target="#barcodeModal"]').forEach(function(element) {
@@ -85,6 +95,64 @@
         });
     });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('a[data-code][data-quantity]').forEach(function(element) {
+            element.addEventListener('click', function() {
+                const batchCode = element.getAttribute('data-code');
+                const quantityProduced = parseInt(element.getAttribute(
+                    'data-quantity'));
+                const {
+                    jsPDF
+                } = window.jspdf;
+                const doc = new jsPDF();
+
+                let x = 10;
+                let y = 10;
+                const barcodeWidth = 30;
+                const barcodeHeight = 15;
+
+                doc.setFontSize(8);
+                for (let i = 0; i < quantityProduced; i++) {
+                    const barcodeImage = new Image();
+                    JsBarcode(barcodeImage, batchCode, {
+                        format: "CODE128",
+                        displayValue: false,
+                        width: 2,
+                        height: 30,
+                    });
+
+                    barcodeImage.onload = function() {
+                        doc.addImage(barcodeImage, 'PNG', x, y, barcodeWidth,
+                            barcodeHeight);
+
+                        const textWidth = doc.getTextWidth(batchCode);
+                        doc.text(batchCode, x + (barcodeWidth / 2) - (textWidth / 2), y +
+                            barcodeHeight + 2);
+
+                        x += barcodeWidth + 5;
+
+                        if (x + barcodeWidth > 190) {
+                            x = 10;
+                            y += barcodeHeight +
+                                10;
+
+                            if (y > 270) {
+                                y = 10;
+                                doc.addPage();
+                            }
+                        }
+
+                        if (i === quantityProduced - 1) {
+                            doc.save(`${batchCode}_${quantityProduced}_barcodes.pdf`);
+                        }
+                    };
+                }
+            });
+        });
+    });
+</script>
+
 @push('styles-priority')
     <link href="{{ asset('storage/assets/extensions/simple-datatables/style.css') }}" rel="stylesheet">
     <link href="{{ asset('storage/assets/compiled/css/table-datatable.css') }}" rel="stylesheet" crossorigin>

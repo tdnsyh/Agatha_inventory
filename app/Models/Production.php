@@ -19,11 +19,6 @@ class Production extends Model
     ];
 
 
-    public function productionRequest()
-    {
-        return $this->belongsTo(ProductionRequest::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);

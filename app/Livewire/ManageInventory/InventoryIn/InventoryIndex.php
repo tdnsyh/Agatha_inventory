@@ -15,7 +15,11 @@ class InventoryIndex extends Component
 
     public function render()
     {
-        $inventoryIn = InventoryIn::with('product')->get();
+        $inventoryIn = InventoryIn::with('product')
+            ->leftJoin('detail_production', 'inventory_in.batch_code', '=', 'detail_production.batch_code')
+            ->select('inventory_in.*', 'detail_production.quantity_produced')
+            ->get();
+
         return view('livewire.manage-inventory.inventory-in.inventory-index', compact('inventoryIn'));
     }
 }

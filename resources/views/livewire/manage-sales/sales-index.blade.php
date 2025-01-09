@@ -42,11 +42,6 @@
                                                     href="{{ route('sales.show', $sale->id) }}">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-
-                                                <a class="btn icon icon-left btn-sm btn-warning"
-                                                    href="{{ route('sales.update', $sale->id) }}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach

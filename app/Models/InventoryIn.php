@@ -27,7 +27,6 @@ class InventoryIn extends Model
         'expiration_date' => 'date',
     ];
 
-
     public function product()
     {
         return $this->belongsTo(Products::class, 'product_id');

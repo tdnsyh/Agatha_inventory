@@ -17,6 +17,11 @@
                     <h4 class="card-title">Edit Production Request</h4>
                 </div>
                 <div class="card-body">
+                    <div class="col mb-3">
+                        <label class="form-label">Request Date</label>
+                        <input type="text" class="form-control"
+                            value="{{ \Carbon\Carbon::parse($requestDate)->format('d-m-Y') }}" readonly>
+                    </div>
                     @foreach ($details as $detail)
                         <div class="mb-3 row">
                             <div class="col-md-6">

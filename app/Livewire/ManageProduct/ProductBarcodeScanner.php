@@ -28,7 +28,6 @@ class ProductBarcodeScanner extends Component
 
     public function searchProduct()
     {
-
         $this->inventoryIn = InventoryIn::where('batch_code', $this->barcode)->first();
 
         if ($this->inventoryIn) {
@@ -38,6 +37,8 @@ class ProductBarcodeScanner extends Component
             $this->product = null;
             $this->inventoryOut = null;
         }
+
+        $this->barcode = '';
     }
 
     public function render()

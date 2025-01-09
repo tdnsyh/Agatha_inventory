@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use App\Models\DetailProduction;
 use App\Models\Products;
+use App\Models\Production;
 
 #[Title('Update Production Request')]
 class InventoryRequestUpdate extends Component
@@ -18,6 +19,9 @@ class InventoryRequestUpdate extends Component
     public $details = [];
     public $selectedProductId = [];
     public $selectedQuantity = [];
+    public $inventoryRequestId;
+    public $requestDate;
+
 
     protected $rules = [
         'selectedProductId.*' => 'required|exists:products,id',
@@ -27,6 +31,9 @@ class InventoryRequestUpdate extends Component
     public function mount($id)
     {
         $this->id = $id;
+        $production = Production::find($this->id);
+        $this->inventoryRequestId = $production->inventory_request_id;
+        $this->requestDate = $production->request_date;
 
         $this->details = DetailProduction::where('production_id', $this->id)->get();
         foreach ($this->details as $detail) {
@@ -34,6 +41,7 @@ class InventoryRequestUpdate extends Component
             $this->selectedQuantity[$detail->id] = $detail->quantity_produced;
         }
     }
+
 
     public function updateDetails()
     {
